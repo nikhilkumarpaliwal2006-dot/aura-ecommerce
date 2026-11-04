@@ -1,0 +1,14 @@
+{
+  "name": "aura-luxury-ecommerce",
+  "version": "1.0.0",
+  "description": "Full-stack professional e-commerce platform with Node.js/Express backend & React/Tailwind frontend",
+  "scripts": {
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build:frontend": "npm --prefix frontend run build"
+  },
+  "keywords": ["ecommerce", "react", "express", "tailwind", "fullstack"],
+  "author": "Antigravity",
+  "license": "MIT"
+}
