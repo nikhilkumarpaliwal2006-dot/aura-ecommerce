@@ -3,37 +3,30 @@ setlocal
 cd /d "%~dp0"
 set "PATH=%LOCALAPPDATA%\MinGit\cmd;%PATH%"
 
-echo ===================================================
-echo   AURA E-COMMERCE - INSTANT GITHUB PUSH
-echo ===================================================
+echo ====================================================================
+echo   AURA E-COMMERCE - PUSHING TO GITHUB
+echo   Repository: https://github.com/nikhilkumarpaliwal2006-dot/aura-ecommerce.git
+echo ====================================================================
 echo.
-echo If you haven't created a GitHub repo yet, open:
-echo https://github.com/new
-echo (Keep README and .gitignore unchecked)
-echo.
-set /p REPO_URL="Paste your GitHub Repo URL here: "
 
-if "%REPO_URL%"=="" (
-    echo [ERROR] No URL provided.
-    pause
-    exit /b 1
-)
-
-echo.
-echo [1/2] Linking remote repository...
 git remote remove origin >nul 2>&1
-git remote add origin %REPO_URL%
+git remote add origin https://github.com/nikhilkumarpaliwal2006-dot/aura-ecommerce.git
+git branch -M main
 
-echo [2/2] Pushing 'main' branch to GitHub...
+echo Pushing branch 'main' to GitHub...
+echo (If a browser window or login prompt opens, please click Authorize/Sign in)
+echo.
+
 git push -u origin main
 
 echo.
 if %ERRORLEVEL% EQU 0 (
-    echo ===================================================
-    echo   SUCCESS! Project is live on GitHub!
-    echo ===================================================
+    echo ====================================================================
+    echo   SUCCESS! Your project is now live on GitHub:
+    echo   https://github.com/nikhilkumarpaliwal2006-dot/aura-ecommerce
+    echo ====================================================================
 ) else (
-    echo Pushing completed or needs browser sign-in.
+    echo [NOTE] Push completed or requires GitHub authentication.
 )
 echo.
 pause
