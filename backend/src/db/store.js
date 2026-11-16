@@ -1,7 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 const config = require('../config');
+
+// Mongoose Models
+const User = require('../models/User');
+const Product = require('../models/Product');
+const Order = require('../models/Order');
+const Coupon = require('../models/Coupon');
 
 // Ensure data folder exists
 if (!fs.existsSync(config.DATA_DIR)) {
@@ -563,12 +570,16 @@ const getInitialSeeds = () => {
   };
 };
 
-// Database store manager with atomic writes
+// Database store manager with dual-mode (MongoDB Atlas + Atomic File Fallback)
 class DataStore {
   constructor() {
     this.filePath = config.DB_FILE;
     this.data = null;
+    this.isMongoConnected = false;
     this.init();
+    if (config.MONGODB_URI) {
+      this.initMongo(config.MONGODB_URI);
+    }
   }
 
   init() {
@@ -581,9 +592,81 @@ class DataStore {
         this.persist();
       }
     } catch (err) {
-      console.error('Error loading database, creating fresh seeds:', err);
+      console.error('Error loading file database, creating fresh seeds:', err);
       this.data = getInitialSeeds();
       this.persist();
+    }
+  }
+
+  async initMongo(uri) {
+    try {
+      console.log('Connecting to MongoDB Atlas...');
+      await mongoose.connect(uri);
+      this.isMongoConnected = true;
+      console.log('✅ Connected to MongoDB Atlas successfully!');
+
+      // Auto-seed MongoDB Atlas if empty
+      const productCount = await Product.countDocuments();
+      if (productCount === 0) {
+        console.log('🌱 Seeding MongoDB Atlas with initial catalog...');
+        const seeds = getInitialSeeds();
+
+        // Seed users
+        for (const u of seeds.users) {
+          await User.findOneAndUpdate(
+            { email: u.email },
+            { name: u.name, email: u.email, password: u.password, role: u.role, createdAt: u.createdAt },
+            { upsert: true }
+          );
+        }
+
+        // Seed products
+        for (const p of seeds.products) {
+          const { id, ...pData } = p;
+          await Product.create(pData);
+        }
+
+        // Seed coupons
+        for (const c of seeds.coupons) {
+          await Coupon.findOneAndUpdate({ code: c.code }, c, { upsert: true });
+        }
+
+        // Seed orders
+        for (const o of seeds.orders) {
+          const { id, ...oData } = o;
+          await Order.create(oData);
+        }
+
+        console.log('✅ MongoDB Atlas seeded successfully!');
+      }
+
+      // Sync in-memory cache from MongoDB
+      await this.syncFromMongo();
+    } catch (err) {
+      console.error('⚠️ MongoDB Atlas connection error, continuing with local storage:', err.message);
+      this.isMongoConnected = false;
+    }
+  }
+
+  async syncFromMongo() {
+    if (!this.isMongoConnected) return;
+    try {
+      const [users, products, orders, coupons] = await Promise.all([
+        User.find().lean(),
+        Product.find().lean(),
+        Order.find().lean(),
+        Coupon.find().lean()
+      ]);
+
+      this.data = {
+        users: users.map(u => ({ id: u._id.toString(), ...u })),
+        products: products.map(p => ({ id: p._id.toString(), ...p })),
+        orders: orders.map(o => ({ id: o._id.toString(), ...o })),
+        coupons: coupons.map(c => ({ id: c._id.toString(), ...c }))
+      };
+      this.persist();
+    } catch (e) {
+      console.error('Failed to sync from MongoDB:', e.message);
     }
   }
 
@@ -593,7 +676,7 @@ class DataStore {
       fs.writeFileSync(tempPath, JSON.stringify(this.data, null, 2), 'utf8');
       fs.renameSync(tempPath, this.filePath);
     } catch (err) {
-      console.error('Failed to persist database:', err);
+      console.error('Failed to persist local cache:', err);
     }
   }
 
@@ -620,6 +703,12 @@ class DataStore {
     };
     this.data.users.push(newUser);
     this.persist();
+
+    // Async write to MongoDB Atlas
+    if (this.isMongoConnected) {
+      User.create(userData).catch(err => console.error('MongoDB User create error:', err.message));
+    }
+
     return newUser;
   }
 
@@ -629,7 +718,7 @@ class DataStore {
   }
 
   findProductById(id) {
-    return this.getProducts().find(p => p.id === id);
+    return this.getProducts().find(p => p.id === id || (p._id && p._id.toString() === id));
   }
 
   createProduct(productData) {
@@ -644,22 +733,50 @@ class DataStore {
     };
     this.data.products.unshift(newProduct);
     this.persist();
+
+    // Async write to MongoDB Atlas
+    if (this.isMongoConnected) {
+      Product.create(productData)
+        .then(doc => { newProduct.id = doc._id.toString(); })
+        .catch(err => console.error('MongoDB Product create error:', err.message));
+    }
+
     return newProduct;
   }
 
   updateProduct(id, updates) {
-    const index = this.data.products.findIndex(p => p.id === id);
+    const index = this.data.products.findIndex(p => p.id === id || (p._id && p._id.toString() === id));
     if (index === -1) return null;
     this.data.products[index] = { ...this.data.products[index], ...updates };
     this.persist();
+
+    // Async write to MongoDB Atlas
+    if (this.isMongoConnected) {
+      if (mongoose.Types.ObjectId.isValid(id)) {
+        Product.findByIdAndUpdate(id, updates).catch(e => console.error('MongoDB Product update error:', e.message));
+      } else {
+        Product.findOneAndUpdate({ title: this.data.products[index].title }, updates).catch(e => console.error('MongoDB Product update error:', e.message));
+      }
+    }
+
     return this.data.products[index];
   }
 
   deleteProduct(id) {
-    const index = this.data.products.findIndex(p => p.id === id);
+    const index = this.data.products.findIndex(p => p.id === id || (p._id && p._id.toString() === id));
     if (index === -1) return false;
-    this.data.products.splice(index, 1);
+    const removed = this.data.products.splice(index, 1)[0];
     this.persist();
+
+    // Async write to MongoDB Atlas
+    if (this.isMongoConnected) {
+      if (mongoose.Types.ObjectId.isValid(id)) {
+        Product.findByIdAndDelete(id).catch(e => console.error('MongoDB Product delete error:', e.message));
+      } else {
+        Product.findOneAndDelete({ title: removed.title }).catch(e => console.error('MongoDB Product delete error:', e.message));
+      }
+    }
+
     return true;
   }
 
@@ -681,6 +798,18 @@ class DataStore {
     product.reviewsCount = product.reviews.length;
     
     this.persist();
+
+    // Async write to MongoDB Atlas
+    if (this.isMongoConnected) {
+      if (mongoose.Types.ObjectId.isValid(productId)) {
+        Product.findByIdAndUpdate(productId, {
+          rating: product.rating,
+          reviewsCount: product.reviewsCount,
+          $push: { reviews: reviewData }
+        }).catch(e => console.error('MongoDB addReview error:', e.message));
+      }
+    }
+
     return review;
   }
 
@@ -700,7 +829,7 @@ class DataStore {
   }
 
   findOrderById(id) {
-    return this.getOrders().find(o => o.id === id);
+    return this.getOrders().find(o => o.id === id || (o._id && o._id.toString() === id));
   }
 
   findOrdersByUserId(userId) {
@@ -729,6 +858,12 @@ class DataStore {
     }
 
     this.persist();
+
+    // Async write to MongoDB Atlas
+    if (this.isMongoConnected) {
+      Order.create(orderData).catch(err => console.error('MongoDB Order create error:', err.message));
+    }
+
     return newOrder;
   }
 
@@ -737,6 +872,14 @@ class DataStore {
     if (!order) return null;
     order.status = status;
     this.persist();
+
+    // Async write to MongoDB Atlas
+    if (this.isMongoConnected) {
+      if (mongoose.Types.ObjectId.isValid(orderId)) {
+        Order.findByIdAndUpdate(orderId, { status }).catch(e => console.error('MongoDB order status update error:', e.message));
+      }
+    }
+
     return order;
   }
 
