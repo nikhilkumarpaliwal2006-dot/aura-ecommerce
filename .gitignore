@@ -28,3 +28,5 @@ Thumbs.db
 
 # Temporary files & DB tmp
 *.tmp
+
+.git-bin/
