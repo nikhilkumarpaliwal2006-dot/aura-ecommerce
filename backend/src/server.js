@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const config = require('./config');
+const store = require('./db/store');
 
 // Route imports
 const authRoutes = require('./routes/authRoutes');
@@ -32,6 +33,12 @@ app.get('/api/v1/health', (req, res) => {
     status: 'online',
     store: 'Aura Store API',
     version: '1.0.0',
+    database: store.isMongoConnected
+      ? 'MongoDB Atlas (Connected)'
+      : config.MONGODB_URI
+        ? 'MongoDB Atlas (Failed to connect - check credentials/IP whitelist)'
+        : 'Local Persistent File Store (store.json)',
+    mongoConnected: store.isMongoConnected,
     timestamp: new Date().toISOString()
   });
 });
