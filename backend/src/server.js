@@ -27,6 +27,26 @@ app.use((req, res, next) => {
   next();
 });
 
+// Root Welcome endpoint
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    message: 'Welcome to Aura Store API Server',
+    version: '1.0.0',
+    database: store.isMongoConnected
+      ? 'MongoDB Atlas (Connected)'
+      : config.MONGODB_URI
+        ? 'MongoDB Atlas (Failed to connect - check credentials/IP whitelist)'
+        : 'Local Persistent File Store (store.json)',
+    mongoConnected: store.isMongoConnected,
+    endpoints: {
+      health: '/api/v1/health',
+      products: '/api/v1/products',
+      orders: '/api/v1/orders'
+    }
+  });
+});
+
 // Health check
 app.get('/api/v1/health', (req, res) => {
   res.json({
