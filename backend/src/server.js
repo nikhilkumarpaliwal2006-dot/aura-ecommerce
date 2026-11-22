@@ -39,6 +39,7 @@ app.get('/', (req, res) => {
         ? 'MongoDB Atlas (Failed to connect - check credentials/IP whitelist)'
         : 'Local Persistent File Store (store.json)',
     mongoConnected: store.isMongoConnected,
+    mongoError: store.mongoError || null,
     endpoints: {
       health: '/api/v1/health',
       products: '/api/v1/products',
@@ -59,6 +60,7 @@ app.get('/api/v1/health', (req, res) => {
         ? 'MongoDB Atlas (Failed to connect - check credentials/IP whitelist)'
         : 'Local Persistent File Store (store.json)',
     mongoConnected: store.isMongoConnected,
+    mongoError: store.mongoError || null,
     timestamp: new Date().toISOString()
   });
 });

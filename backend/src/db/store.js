@@ -576,6 +576,7 @@ class DataStore {
     this.filePath = config.DB_FILE;
     this.data = null;
     this.isMongoConnected = false;
+    this.mongoError = null;
     this.init();
     if (config.MONGODB_URI) {
       this.initMongo(config.MONGODB_URI);
@@ -645,6 +646,7 @@ class DataStore {
     } catch (err) {
       console.error('⚠️ MongoDB Atlas connection error, continuing with local storage:', err.message);
       this.isMongoConnected = false;
+      this.mongoError = err.message;
     }
   }
 
