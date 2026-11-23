@@ -20,6 +20,7 @@ import Toast from './components/Toast';
 import Footer from './components/Footer';
 import GatewayAuth from './components/GatewayAuth';
 import PostLoginAnimation from './components/PostLoginAnimation';
+import VideoProductSpotlight from './components/VideoProductSpotlight';
 
 function ShopContent() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
@@ -155,8 +156,14 @@ function ShopContent() {
         products={products}
       />
 
-      {/* Hero Showcase Slider */}
-      <HeroSlider onExploreClick={scrollToCatalog} />
+      {/* Hero Showcase Slider with Video Background */}
+      <HeroSlider
+        onExploreClick={scrollToCatalog}
+        onQuickView={(id) => {
+          const p = products.find(x => x.id === id);
+          if (p) setQuickViewProduct(p);
+        }}
+      />
 
       {/* Catalog Anchor */}
       <div ref={catalogRef}>
@@ -195,6 +202,15 @@ function ShopContent() {
           />
         </main>
       </div>
+
+      {/* Dedicated In-Motion Video Product Spotlight */}
+      <VideoProductSpotlight
+        product={products.find(p => p.id === 'prod_1') || products[0]}
+        onQuickView={(id) => {
+          const p = products.find(x => x.id === id);
+          if (p) setQuickViewProduct(p);
+        }}
+      />
 
       {/* Footer */}
       <Footer

@@ -1,100 +1,265 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowRight, ChevronLeft, ChevronRight, ShieldCheck, Truck, RefreshCw, Award } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  ShieldCheck,
+  Truck,
+  RefreshCw,
+  Award,
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  Sparkles,
+  Radio
+} from 'lucide-react';
 
 const SLIDES = [
   {
-    tag: 'NEW AUDIO RELEASE 2026',
+    tag: 'FLAGSHIP AUDIO RELEASE 2026',
     title: 'Acoustic Precision. Pure Silence.',
     subtitle: 'Engineered with custom 40mm beryllium drivers and hybrid active noise cancellation for the purest sonic listening experience.',
     cta: 'Discover NIKK AURA Studio',
+    video: '/videos/headphones.mp4',
+    videoFallback: 'https://assets.mixkit.co/videos/5452/5452-720.mp4',
     image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1600&q=80',
-    highlight: '₹24,900'
+    highlight: '₹24,900',
+    productId: 'prod_1',
+    productName: 'NIKK AURA Studio Wireless Headphones',
+    rating: '4.9 ★ (128 reviews)'
   },
   {
     tag: 'HOROLOGY & BIOMETRICS',
     title: 'Grade-5 Titanium. Sapphire Crystal.',
     subtitle: 'Seamlessly marrying timeless Swiss minimalism with continuous health biomonitoring and 14 days of relentless battery life.',
-    cta: 'Explore Chronos',
+    cta: 'Explore Chronos Watch',
+    video: '/videos/watch.mp4',
+    videoFallback: 'https://assets.mixkit.co/videos/9104/9104-720.mp4',
     image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1600&q=80',
-    highlight: '₹32,500'
+    highlight: '₹32,500',
+    productId: 'prod_2',
+    productName: 'Chronos Titanium Minimalist Smartwatch',
+    rating: '4.8 ★ (94 reviews)'
   },
   {
     tag: 'MONGOLIAN CASHMERE EDIT',
     title: 'Unrivaled Softness. Timeless Drape.',
     subtitle: 'Woven from ethically harvested grade-A cashmere fibers, tailored for warmth without bulk across every season.',
-    cta: 'Shop Cashmere',
+    cta: 'Shop Cashmere Collection',
+    video: 'https://assets.mixkit.co/videos/32692/32692-720.mp4',
+    videoFallback: 'https://assets.mixkit.co/videos/4146/4146-720.mp4',
     image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=1600&q=80',
-    highlight: '₹42,500'
+    highlight: '₹42,500',
+    productId: 'prod_3',
+    productName: 'Kashmir Pure Cashmere Oversized Overcoat',
+    rating: '5.0 ★ (42 reviews)'
   }
 ];
 
-export default function HeroSlider({ onExploreClick }) {
+export default function HeroSlider({ onExploreClick, onQuickView }) {
   const [currentSlide, setCurrentSlide] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide(prev => (prev + 1) % SLIDES.length);
-    }, 6500);
-    return () => clearInterval(timer);
-  }, []);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const videoRef = useRef(null);
 
   const slide = SLIDES[currentSlide];
 
+  // Auto slide advance timer
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide(prev => (prev + 1) % SLIDES.length);
+    }, 7500);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Update video playback when slide changes
+  useEffect(() => {
+    setVideoLoaded(false);
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play().catch(() => {
+        // Autoplay policy fallback
+        setIsPlaying(false);
+      });
+    }
+  }, [currentSlide]);
+
+  const togglePlay = () => {
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      videoRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
+  const toggleMute = () => {
+    if (!videoRef.current) return;
+    videoRef.current.muted = !isMuted;
+    setIsMuted(!isMuted);
+  };
+
   return (
-    <div className="relative bg-zinc-950 text-white overflow-hidden">
-      {/* Background Image with Dark Vignette Gradient */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src={slide.image}
-          alt={slide.title}
-          className="w-full h-full object-cover object-center opacity-40 scale-105 transition-all duration-1000 ease-out"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/80 to-transparent"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent"></div>
+    <div className="relative bg-zinc-950 text-white overflow-hidden select-none">
+      
+      {/* Background Video Layer with Smooth Fade Animation */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        {slide.video ? (
+          <video
+            ref={videoRef}
+            key={slide.video}
+            autoPlay
+            loop
+            muted={isMuted}
+            playsInline
+            onCanPlay={() => setVideoLoaded(true)}
+            poster={slide.image}
+            className={`w-full h-full object-cover object-center transition-opacity duration-1000 ${
+              videoLoaded ? 'opacity-45 scale-100' : 'opacity-20 scale-105'
+            }`}
+          >
+            <source src={slide.video} type="video/mp4" />
+            {slide.videoFallback && <source src={slide.videoFallback} type="video/mp4" />}
+          </video>
+        ) : (
+          <img
+            src={slide.image}
+            alt={slide.title}
+            className="w-full h-full object-cover object-center opacity-40 scale-105 transition-all duration-1000 ease-out"
+          />
+        )}
+
+        {/* Ambient Dark Luxury Gradients */}
+        <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/85 to-zinc-950/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-zinc-950/40" />
+        
+        {/* Animated ambient light orb */}
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-[120px] pointer-events-none animate-pulse" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 min-h-[520px] flex flex-col justify-between">
-        <div className="max-w-2xl">
-          {/* Tag */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-amber-300 text-xs font-bold uppercase tracking-widest mb-6">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
-            {slide.tag}
+      {/* Main Container */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 min-h-[580px] flex flex-col justify-between">
+        
+        {/* Top Floating Video Controls & Badge */}
+        <div className="flex items-center justify-between gap-4 mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900/80 backdrop-blur-md border border-amber-400/30 text-amber-300 text-xs font-bold uppercase tracking-widest shadow-lg shadow-black/40">
+            <Radio className="w-3.5 h-3.5 text-rose-500 animate-pulse" />
+            <span>CINEMATIC PRODUCT REEL</span>
           </div>
 
-          {/* Heading */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] mb-5 font-sans">
-            {slide.title}
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-base sm:text-lg text-zinc-300 font-light leading-relaxed mb-8 max-w-xl">
-            {slide.subtitle}
-          </p>
-
-          {/* Action CTAs */}
-          <div className="flex flex-wrap items-center gap-4">
+          {/* Video Control Buttons */}
+          <div className="flex items-center gap-2">
             <button
-              onClick={onExploreClick}
-              className="px-7 py-3.5 bg-white text-zinc-950 hover:bg-zinc-200 font-bold text-sm rounded-full transition-all flex items-center gap-2 shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95"
+              onClick={togglePlay}
+              className="p-2 rounded-full bg-zinc-900/70 hover:bg-zinc-800 backdrop-blur-md border border-zinc-700/60 text-zinc-300 hover:text-white transition-all shadow-md"
+              title={isPlaying ? 'Pause video' : 'Play video'}
+              aria-label="Toggle video playback"
             >
-              <span>{slide.cta}</span>
-              <ArrowRight className="w-4 h-4" />
+              {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
             </button>
-            <div className="flex items-center gap-2 px-4 py-2 text-zinc-400 text-xs">
-              <span>Starting at</span>
-              <strong className="text-white text-base font-semibold">{slide.highlight}</strong>
-            </div>
+            <button
+              onClick={toggleMute}
+              className="p-2 rounded-full bg-zinc-900/70 hover:bg-zinc-800 backdrop-blur-md border border-zinc-700/60 text-zinc-300 hover:text-white transition-all shadow-md"
+              title={isMuted ? 'Unmute audio' : 'Mute audio'}
+              aria-label="Toggle mute"
+            >
+              {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5 text-amber-400" />}
+            </button>
           </div>
         </div>
 
+        {/* Content Section with Interactive Floating Card */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center my-auto">
+          
+          {/* Left Column: Heading and Description */}
+          <div className="lg:col-span-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-amber-300 text-[11px] font-bold uppercase tracking-widest mb-4">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+              {slide.tag}
+            </div>
+
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight leading-[1.1] mb-5 text-white">
+              {slide.title}
+            </h1>
+
+            <p className="text-sm sm:text-base text-zinc-300 font-light leading-relaxed mb-8 max-w-xl">
+              {slide.subtitle}
+            </p>
+
+            {/* CTAs */}
+            <div className="flex flex-wrap items-center gap-4">
+              <button
+                onClick={onExploreClick}
+                className="px-7 py-3.5 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-bold text-sm rounded-full transition-all flex items-center gap-2 shadow-xl hover:shadow-amber-500/20 hover:scale-105 active:scale-95 cursor-pointer"
+              >
+                <span>{slide.cta}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+              
+              <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900/60 backdrop-blur-md border border-zinc-800 rounded-full text-zinc-400 text-xs">
+                <span>Direct Price</span>
+                <strong className="text-amber-300 text-base font-semibold">{slide.highlight}</strong>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Floating Animated Product Spotlight Card */}
+          <div className="lg:col-span-4 hidden lg:flex justify-end">
+            <div className="relative group cursor-pointer" onClick={() => onQuickView && onQuickView(slide.productId)}>
+              {/* Outer Glowing Border */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/40 via-amber-300/30 to-amber-600/40 rounded-3xl blur-md opacity-75 group-hover:opacity-100 transition-opacity animate-pulse duration-1000" />
+              
+              {/* Glass Card */}
+              <div className="relative bg-zinc-900/85 backdrop-blur-xl border border-amber-400/30 rounded-2xl p-5 shadow-2xl max-w-xs transition-transform transform group-hover:-translate-y-1 duration-300">
+                <div className="flex items-center justify-between text-[10px] uppercase font-bold text-amber-400 tracking-wider mb-2">
+                  <span className="flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-amber-400" />
+                    <span>In-Motion Preview</span>
+                  </span>
+                  <span className="text-emerald-400">● Live</span>
+                </div>
+
+                {/* Mini Image thumbnail */}
+                <div className="aspect-[4/3] rounded-xl overflow-hidden mb-3 border border-zinc-800 relative">
+                  <img
+                    src={slide.image}
+                    alt={slide.productName}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent flex items-end p-2.5">
+                    <span className="text-[11px] font-bold text-white tracking-wide">
+                      {slide.productName}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-xs pt-1">
+                  <span className="text-zinc-400 font-medium">{slide.rating}</span>
+                  <span className="text-sm font-extrabold text-amber-300 font-mono">{slide.highlight}</span>
+                </div>
+
+                <div className="mt-3 pt-2.5 border-t border-zinc-800 flex items-center justify-between text-[11px] text-zinc-400 group-hover:text-amber-300 transition-colors">
+                  <span>Click for Specifications</span>
+                  <span>&rarr;</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
         {/* Carousel Indicators and Controls */}
-        <div className="flex items-center justify-between pt-12 border-t border-white/10 mt-12">
+        <div className="flex items-center justify-between pt-8 border-t border-white/10 mt-8">
           <div className="flex items-center gap-2">
             {SLIDES.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentSlide(idx)}
-                className={`h-1.5 rounded-full transition-all ${
+                className={`h-1.5 rounded-full transition-all cursor-pointer ${
                   idx === currentSlide ? 'w-8 bg-amber-400' : 'w-2 bg-white/30 hover:bg-white/50'
                 }`}
                 aria-label={`Go to slide ${idx + 1}`}
@@ -105,14 +270,14 @@ export default function HeroSlider({ onExploreClick }) {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setCurrentSlide(prev => (prev - 1 + SLIDES.length) % SLIDES.length)}
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
               aria-label="Previous slide"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={() => setCurrentSlide(prev => (prev + 1) % SLIDES.length)}
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
               aria-label="Next slide"
             >
               <ChevronRight className="w-5 h-5" />
