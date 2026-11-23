@@ -57,20 +57,20 @@ exports.createOrder = async (req, res) => {
       }
     }
 
-    // Shipping fee: Free if subtotal > 100 or standard delivery, $15 for Express
+    // Shipping fee: Free if subtotal >= 2499 or standard delivery, ₹499 for Express
     const isExpress = deliverySpeed === 'express';
-    const shippingFee = isExpress ? 15.00 : (subtotal >= 100 ? 0.00 : 9.99);
+    const shippingFee = isExpress ? 499.00 : (subtotal >= 2499 ? 0.00 : 199.00);
 
-    // Estimated Tax (approx 7.25%)
+    // Estimated Tax / GST (approx 5%)
     const taxableAmount = Math.max(0, subtotal - discountAmount);
-    const taxAmount = parseFloat((taxableAmount * 0.0725).toFixed(2));
+    const taxAmount = parseFloat((taxableAmount * 0.05).toFixed(2));
 
     const totalAmount = parseFloat((taxableAmount + shippingFee + taxAmount).toFixed(2));
 
     // Determine customer info
     const userId = req.user ? req.user.id : null;
     const customerName = shippingAddress.fullName;
-    const customerEmail = req.user ? req.user.email : (shippingAddress.email || 'guest@aura.com');
+    const customerEmail = req.user ? req.user.email : (shippingAddress.email || 'guest@nikkaura.com');
 
     const newOrder = store.createOrder({
       userId,
@@ -84,8 +84,8 @@ exports.createOrder = async (req, res) => {
       shippingFee,
       taxAmount,
       totalAmount,
-      deliverySpeed: isExpress ? 'Express Priority (1-2 Days)' : 'Standard Ground (3-5 Days)',
-      paymentMethod: paymentMethod || 'Simulated Credit Card',
+      deliverySpeed: isExpress ? 'Express Air Priority (1-2 Days)' : 'Standard Ground Delivery (3-5 Days)',
+      paymentMethod: paymentMethod || 'UPI / Credit Card (Simulated)',
       estimatedDelivery: new Date(Date.now() + (isExpress ? 2 : 5) * 86400000).toISOString().split('T')[0]
     });
 

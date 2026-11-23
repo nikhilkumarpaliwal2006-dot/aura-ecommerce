@@ -151,7 +151,7 @@ export default function OrderHistoryModal({ isOpen, onClose }) {
                         {getStatusBadge(order.status)}
                       </div>
                       <div className={`text-[11px] ${selectedOrder?.id === order.id ? 'text-zinc-300' : 'text-zinc-500'}`}>
-                        {new Date(order.createdAt).toLocaleDateString()} · ${order.totalAmount?.toFixed(2)}
+                        {new Date(order.createdAt).toLocaleDateString()} · ₹{order.totalAmount?.toLocaleString('en-IN')}
                       </div>
                     </button>
                   ))}
@@ -222,7 +222,7 @@ export default function OrderHistoryModal({ isOpen, onClose }) {
                             <img src={it.image} alt="" className="w-10 h-10 object-cover rounded-lg" />
                             <div className="flex-1 min-w-0 text-xs">
                               <div className="font-bold text-zinc-900 truncate">{it.title}</div>
-                              <div className="text-zinc-500">Qty: {it.quantity} · ${(it.price * it.quantity).toFixed(2)}</div>
+                              <div className="text-zinc-500">Qty: {it.quantity} · ₹{(it.price * it.quantity).toLocaleString('en-IN')}</div>
                             </div>
                           </div>
                         ))}
@@ -233,25 +233,25 @@ export default function OrderHistoryModal({ isOpen, onClose }) {
                     <div className="p-4 bg-white rounded-xl border border-zinc-200 space-y-1.5 text-xs text-zinc-600">
                       <div className="flex justify-between">
                         <span>Subtotal:</span>
-                        <span>${selectedOrder.subtotal?.toFixed(2)}</span>
+                        <span>₹{selectedOrder.subtotal?.toLocaleString('en-IN')}</span>
                       </div>
                       {selectedOrder.discountAmount > 0 && (
                         <div className="flex justify-between text-emerald-600">
                           <span>Discount Applied:</span>
-                          <span>-${selectedOrder.discountAmount?.toFixed(2)}</span>
+                          <span>-₹{selectedOrder.discountAmount?.toLocaleString('en-IN')}</span>
                         </div>
                       )}
                       <div className="flex justify-between">
                         <span>Shipping & Handling:</span>
-                        <span>${selectedOrder.shippingFee?.toFixed(2)}</span>
+                        <span>₹{selectedOrder.shippingFee?.toLocaleString('en-IN')}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Taxes:</span>
-                        <span>${selectedOrder.taxAmount?.toFixed(2)}</span>
+                        <span>Taxes (GST):</span>
+                        <span>₹{selectedOrder.taxAmount?.toLocaleString('en-IN')}</span>
                       </div>
                       <div className="flex justify-between text-sm font-extrabold text-zinc-900 pt-2 border-t border-zinc-100">
                         <span>Total Paid:</span>
-                        <span>${selectedOrder.totalAmount?.toFixed(2)}</span>
+                        <span>₹{selectedOrder.totalAmount?.toLocaleString('en-IN')}</span>
                       </div>
                     </div>
 

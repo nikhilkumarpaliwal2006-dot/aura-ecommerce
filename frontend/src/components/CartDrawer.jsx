@@ -85,7 +85,7 @@ export default function CartDrawer({ onProceedToCheckout }) {
                 </span>
               ) : (
                 <span className="text-zinc-600">
-                  Add <strong className="text-zinc-900">${freeShippingRemaining.toFixed(2)}</strong> more for free shipping
+                  Add <strong className="text-zinc-900">₹{freeShippingRemaining.toLocaleString('en-IN')}</strong> more for free shipping
                 </span>
               )}
               <span className="text-zinc-400 font-bold">{Math.round(freeShippingProgress)}%</span>
@@ -170,7 +170,7 @@ export default function CartDrawer({ onProceedToCheckout }) {
 
                       <div className="text-right">
                         <span className="text-xs font-extrabold text-zinc-900">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          ₹{(item.price * item.quantity).toLocaleString('en-IN')}
                         </span>
                       </div>
                     </div>
@@ -190,7 +190,7 @@ export default function CartDrawer({ onProceedToCheckout }) {
                 <div className="flex items-center justify-between p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs">
                   <div className="flex items-center gap-2 text-emerald-800 font-semibold">
                     <Tag className="w-4 h-4 text-emerald-600" />
-                    <span>Coupon <strong>{coupon.code}</strong> applied (-${discountAmount.toFixed(2)})</span>
+                    <span>Coupon <strong>{coupon.code}</strong> applied (-₹{discountAmount.toLocaleString('en-IN')})</span>
                   </div>
                   <button
                     onClick={removeCoupon}
@@ -225,25 +225,25 @@ export default function CartDrawer({ onProceedToCheckout }) {
               <div className="space-y-1.5 text-xs text-zinc-600 pt-2 border-t border-zinc-100">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span className="font-semibold text-zinc-900">${subtotal.toFixed(2)}</span>
+                  <span className="font-semibold text-zinc-900">₹{subtotal.toLocaleString('en-IN')}</span>
                 </div>
                 {discountAmount > 0 && (
                   <div className="flex justify-between text-emerald-600 font-semibold">
                     <span>Promotional Discount</span>
-                    <span>-${discountAmount.toFixed(2)}</span>
+                    <span>-₹{discountAmount.toLocaleString('en-IN')}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
                   <span>Standard Shipping</span>
-                  <span>{standardShippingFee === 0 ? <strong className="text-emerald-600">FREE</strong> : `$${standardShippingFee.toFixed(2)}`}</span>
+                  <span>{standardShippingFee === 0 ? <strong className="text-emerald-600">FREE</strong> : `₹${standardShippingFee.toLocaleString('en-IN')}`}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Estimated Tax</span>
-                  <span className="font-semibold text-zinc-900">${taxAmount.toFixed(2)}</span>
+                  <span>Estimated GST (5%)</span>
+                  <span className="font-semibold text-zinc-900">₹{taxAmount.toLocaleString('en-IN')}</span>
                 </div>
                 <div className="flex justify-between text-sm font-extrabold text-zinc-900 pt-2 border-t border-zinc-100">
                   <span>Estimated Total</span>
-                  <span className="text-base">${totalAmount.toFixed(2)}</span>
+                  <span className="text-base">₹{totalAmount.toLocaleString('en-IN')}</span>
                 </div>
               </div>
 

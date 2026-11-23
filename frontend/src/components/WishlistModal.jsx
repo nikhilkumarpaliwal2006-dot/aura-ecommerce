@@ -68,7 +68,7 @@ export default function WishlistModal({ isOpen, onClose, onQuickView }) {
                     {product.title}
                   </h4>
                   <div className="text-xs font-extrabold text-zinc-900 mt-1">
-                    ${product.price.toFixed(2)}
+                    ₹{product.price.toLocaleString('en-IN')}
                   </div>
                 </div>
 

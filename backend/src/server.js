@@ -31,7 +31,7 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
   res.json({
     status: 'online',
-    message: 'Welcome to Aura Store API Server',
+    message: 'Welcome to NIKK AURA Store API Server',
     version: '1.0.0',
     database: store.isMongoConnected
       ? 'MongoDB Atlas (Connected)'

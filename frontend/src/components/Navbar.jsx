@@ -56,7 +56,7 @@ export default function Navbar({
           <span>SPRING RELEASE</span>
         </span>
         <span className="hidden sm:inline text-zinc-500">|</span>
-        <span className="hidden sm:inline">Complimentary express shipping on orders over $100</span>
+        <span className="hidden sm:inline">Complimentary express shipping on orders over ₹2,499</span>
         <span className="text-zinc-500">|</span>
         <span>Use code <strong className="text-white underline decoration-amber-400 decoration-2">WELCOME10</strong> for 10% off</span>
       </div>
@@ -69,12 +69,12 @@ export default function Navbar({
             {/* Logo */}
             <div className="flex items-center gap-2">
               <a href="#" className="flex items-center gap-2.5 group">
-                <div className="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-zinc-900/10 group-hover:scale-105 transition-transform">
-                  A
+                <div className="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center text-amber-400 font-serif font-black text-lg shadow-lg shadow-zinc-900/10 group-hover:scale-105 transition-transform">
+                  NA
                 </div>
                 <div className="flex flex-col">
                   <span className="font-extrabold text-2xl tracking-tighter text-zinc-900 leading-tight">
-                    AURA
+                    NIKK <span className="text-amber-600 font-light italic">AURA</span>
                   </span>
                   <span className="text-[10px] uppercase font-bold tracking-[0.25em] text-zinc-400">
                     LIVING & CO.
@@ -121,7 +121,7 @@ export default function Navbar({
                       <img src={product.image} alt={product.title} className="w-10 h-10 object-cover rounded-lg" />
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-semibold text-zinc-900 truncate">{product.title}</div>
-                        <div className="text-xs text-zinc-500">{product.category} · ${product.price.toFixed(2)}</div>
+                        <div className="text-xs text-zinc-500">{product.category} · ₹{product.price.toLocaleString('en-IN')}</div>
                       </div>
                     </button>
                   ))}

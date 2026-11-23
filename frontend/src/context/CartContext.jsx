@@ -133,11 +133,11 @@ export const CartProvider = ({ children }) => {
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
   const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-  // Free shipping threshold: $100
-  const freeShippingThreshold = 100;
+  // Free shipping threshold: ₹2,499
+  const freeShippingThreshold = 2499;
   const freeShippingProgress = Math.min(100, (subtotal / freeShippingThreshold) * 100);
   const freeShippingRemaining = Math.max(0, freeShippingThreshold - subtotal);
-  const standardShippingFee = subtotal >= freeShippingThreshold || subtotal === 0 ? 0 : 9.99;
+  const standardShippingFee = subtotal >= freeShippingThreshold || subtotal === 0 ? 0 : 199;
 
   let discountAmount = 0;
   if (coupon) {
@@ -151,7 +151,7 @@ export const CartProvider = ({ children }) => {
   }
 
   const taxableAmount = Math.max(0, subtotal - discountAmount);
-  const taxAmount = taxableAmount > 0 ? parseFloat((taxableAmount * 0.0725).toFixed(2)) : 0;
+  const taxAmount = taxableAmount > 0 ? parseFloat((taxableAmount * 0.05).toFixed(2)) : 0;
   const totalAmount = parseFloat((taxableAmount + standardShippingFee + taxAmount).toFixed(2));
 
   const applyCoupon = async (code) => {

@@ -5,7 +5,7 @@ const store = require('../db/store');
 
 const generateToken = (user) => {
   return jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
+    { id: user.id || user._id, email: user.email, role: user.role },
     config.JWT_SECRET,
     { expiresIn: config.JWT_EXPIRES_IN }
   );
@@ -23,7 +23,8 @@ exports.register = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long' });
     }
 
-    const existingUser = store.findUserByEmail(email);
+    const cleanEmail = email.trim().toLowerCase();
+    const existingUser = await store.findUserByEmail(cleanEmail);
     if (existingUser) {
       return res.status(409).json({ success: false, message: 'An account with this email already exists' });
     }
@@ -31,9 +32,9 @@ exports.register = async (req, res) => {
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(password, salt);
 
-    const newUser = store.createUser({
+    const newUser = await store.createUser({
       name: name.trim(),
-      email: email.trim().toLowerCase(),
+      email: cleanEmail,
       password: hashedPassword,
       role: 'customer'
     });
@@ -43,7 +44,7 @@ exports.register = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Account created successfully',
+      message: 'Account created successfully and saved in database!',
       token,
       user: userSafe
     });
@@ -61,7 +62,8 @@ exports.login = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please provide email and password' });
     }
 
-    const user = store.findUserByEmail(email);
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await store.findUserByEmail(cleanEmail);
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
@@ -76,7 +78,7 @@ exports.login = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Welcome back!',
+      message: 'Welcome back to NIKK AURA!',
       token,
       user: userSafe
     });

@@ -6,9 +6,9 @@ const SLIDES = [
     tag: 'NEW AUDIO RELEASE 2026',
     title: 'Acoustic Precision. Pure Silence.',
     subtitle: 'Engineered with custom 40mm beryllium drivers and hybrid active noise cancellation for the purest sonic listening experience.',
-    cta: 'Discover Aura Studio',
+    cta: 'Discover NIKK AURA Studio',
     image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1600&q=80',
-    highlight: '$299.00'
+    highlight: '₹24,900'
   },
   {
     tag: 'HOROLOGY & BIOMETRICS',
@@ -16,7 +16,7 @@ const SLIDES = [
     subtitle: 'Seamlessly marrying timeless Swiss minimalism with continuous health biomonitoring and 14 days of relentless battery life.',
     cta: 'Explore Chronos',
     image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1600&q=80',
-    highlight: '$389.00'
+    highlight: '₹32,500'
   },
   {
     tag: 'MONGOLIAN CASHMERE EDIT',
@@ -24,7 +24,7 @@ const SLIDES = [
     subtitle: 'Woven from ethically harvested grade-A cashmere fibers, tailored for warmth without bulk across every season.',
     cta: 'Shop Cashmere',
     image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=1600&q=80',
-    highlight: '$495.00'
+    highlight: '₹42,500'
   }
 ];
 
@@ -127,7 +127,7 @@ export default function HeroSlider({ onExploreClick }) {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs text-zinc-300">
             <div className="flex items-center gap-2.5">
               <Truck className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>Complimentary Shipping Over $100</span>
+              <span>Complimentary Shipping Over ₹2,499</span>
             </div>
             <div className="flex items-center gap-2.5">
               <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />

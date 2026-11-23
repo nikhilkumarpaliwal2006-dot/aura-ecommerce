@@ -15,7 +15,7 @@ if (!fs.existsSync(config.DATA_DIR)) {
   fs.mkdirSync(config.DATA_DIR, { recursive: true });
 }
 
-// Initial seed catalog with premium Unsplash e-commerce photography
+// Initial seed catalog with premium Unsplash photography and Indian Rupee (₹) pricing
 const getInitialSeeds = () => {
   const salt = bcrypt.genSaltSync(10);
   const demoPasswordHash = bcrypt.hashSync('password123', salt);
@@ -26,15 +26,15 @@ const getInitialSeeds = () => {
       {
         id: 'usr_demo_1',
         name: 'Sophia Vance',
-        email: 'demo@aura.com',
+        email: 'demo@nikkaura.com',
         password: demoPasswordHash,
         role: 'customer',
         createdAt: '2026-01-15T10:00:00Z'
       },
       {
         id: 'usr_admin_1',
-        name: 'Marcus Sterling',
-        email: 'admin@aura.com',
+        name: 'Nikhil Paliwal',
+        email: 'admin@nikkaura.com',
         password: adminPasswordHash,
         role: 'admin',
         createdAt: '2026-01-01T10:00:00Z'
@@ -45,31 +45,31 @@ const getInitialSeeds = () => {
         code: 'WELCOME10',
         discountType: 'percentage',
         discountValue: 10,
-        minOrderAmount: 50,
-        description: '10% off your entire order (Min $50)'
+        minOrderAmount: 2000,
+        description: '10% off your entire order (Min ₹2,000)'
       },
       {
-        code: 'AURA20',
+        code: 'NIKK20',
         discountType: 'percentage',
         discountValue: 20,
-        minOrderAmount: 150,
-        description: '20% off luxury orders over $150'
+        minOrderAmount: 10000,
+        description: '20% off luxury orders over ₹10,000'
       },
       {
-        code: 'FLAT30',
+        code: 'FLAT1500',
         discountType: 'fixed',
-        discountValue: 30,
-        minOrderAmount: 200,
-        description: 'Flat $30 discount on orders over $200'
+        discountValue: 1500,
+        minOrderAmount: 15000,
+        description: 'Flat ₹1,500 discount on orders over ₹15,000'
       }
     ],
     products: [
       {
         id: 'prod_1',
-        title: 'Aura Studio Wireless ANC Headphones',
+        title: 'NIKK AURA Studio Wireless ANC Headphones',
         category: 'Electronics',
-        price: 299.00,
-        originalPrice: 349.00,
+        price: 24999.00,
+        originalPrice: 29999.00,
         rating: 4.9,
         reviewsCount: 128,
         inStock: true,
@@ -83,7 +83,7 @@ const getInitialSeeds = () => {
           'https://images.unsplash.com/photo-1583394838336-acd977736f90?auto=format&fit=crop&w=800&q=80'
         ],
         shortDescription: 'Active noise-cancelling wireless headphones with 40mm beryllium drivers and 36-hour battery.',
-        description: 'Immerse yourself in acoustic perfection. Aura Studio ANC integrates custom 40mm beryllium acoustic transducers with ultra-low latency spatial audio tracking. Features plush memory foam earcups clad in breathable protein leather, fast USB-C charging, and multipoint Bluetooth 5.4 connectivity.',
+        description: 'Immerse yourself in acoustic perfection. NIKK AURA Studio ANC integrates custom 40mm beryllium acoustic transducers with ultra-low latency spatial audio tracking. Features plush memory foam earcups clad in breathable protein leather, fast USB-C charging, and multipoint Bluetooth 5.4 connectivity.',
         features: [
           '40mm custom beryllium acoustic drivers',
           'Hybrid 4-mic active noise cancellation with transparency mode',
@@ -114,8 +114,8 @@ const getInitialSeeds = () => {
         id: 'prod_2',
         title: 'Chronos Sapphire Minimalist Smartwatch',
         category: 'Electronics',
-        price: 389.00,
-        originalPrice: 420.00,
+        price: 32490.00,
+        originalPrice: 36990.00,
         rating: 4.8,
         reviewsCount: 94,
         inStock: true,
@@ -152,8 +152,8 @@ const getInitialSeeds = () => {
         id: 'prod_3',
         title: 'Artisan Cashmere Minimalist Overcoat',
         category: 'Fashion',
-        price: 495.00,
-        originalPrice: 580.00,
+        price: 42500.00,
+        originalPrice: 48000.00,
         rating: 4.9,
         reviewsCount: 62,
         inStock: true,
@@ -191,8 +191,8 @@ const getInitialSeeds = () => {
         id: 'prod_4',
         title: 'Verona Full-Grain Leather Weekender Bag',
         category: 'Accessories',
-        price: 345.00,
-        originalPrice: 395.00,
+        price: 28900.00,
+        originalPrice: 33500.00,
         rating: 4.9,
         reviewsCount: 88,
         inStock: true,
@@ -227,10 +227,10 @@ const getInitialSeeds = () => {
       },
       {
         id: 'prod_5',
-        title: 'Aura Horizon Mechanical Wireless Keyboard',
+        title: 'NIKK AURA Horizon Mechanical Keyboard',
         category: 'Electronics',
-        price: 185.00,
-        originalPrice: 210.00,
+        price: 15490.00,
+        originalPrice: 17990.00,
         rating: 4.7,
         reviewsCount: 145,
         inStock: true,
@@ -266,8 +266,8 @@ const getInitialSeeds = () => {
         id: 'prod_6',
         title: 'Nordic Ceramic Slow Pour-Over Dripper Set',
         category: 'Living',
-        price: 78.00,
-        originalPrice: 92.00,
+        price: 6490.00,
+        originalPrice: 7800.00,
         rating: 4.8,
         reviewsCount: 51,
         inStock: true,
@@ -303,8 +303,8 @@ const getInitialSeeds = () => {
         id: 'prod_7',
         title: 'Luxe Merino Ribbed Crewneck Sweater',
         category: 'Fashion',
-        price: 165.00,
-        originalPrice: 195.00,
+        price: 13990.00,
+        originalPrice: 16500.00,
         rating: 4.7,
         reviewsCount: 77,
         inStock: true,
@@ -339,10 +339,10 @@ const getInitialSeeds = () => {
       },
       {
         id: 'prod_8',
-        title: 'Aura Pure Ultrasonic Stone Diffuser',
+        title: 'NIKK AURA Pure Ultrasonic Stone Diffuser',
         category: 'Living',
-        price: 110.00,
-        originalPrice: 130.00,
+        price: 9490.00,
+        originalPrice: 11200.00,
         rating: 4.8,
         reviewsCount: 63,
         inStock: true,
@@ -378,8 +378,8 @@ const getInitialSeeds = () => {
         id: 'prod_9',
         title: 'Solaris Polarized Acetate Sunglasses',
         category: 'Accessories',
-        price: 175.00,
-        originalPrice: 210.00,
+        price: 14900.00,
+        originalPrice: 17900.00,
         rating: 4.9,
         reviewsCount: 91,
         inStock: true,
@@ -412,10 +412,10 @@ const getInitialSeeds = () => {
       },
       {
         id: 'prod_10',
-        title: 'Aura Soundbar 360 Dolby Atmos Spatial Speaker',
+        title: 'NIKK AURA 360 Dolby Atmos Spatial Speaker',
         category: 'Electronics',
-        price: 450.00,
-        originalPrice: 520.00,
+        price: 38000.00,
+        originalPrice: 44000.00,
         rating: 4.9,
         reviewsCount: 110,
         inStock: true,
@@ -449,10 +449,10 @@ const getInitialSeeds = () => {
       },
       {
         id: 'prod_11',
-        title: 'Minimalist Monolith Magnetic Wireless Charger',
+        title: 'Minimalist Magnetic Wireless Fast Charger',
         category: 'Electronics',
-        price: 75.00,
-        originalPrice: 90.00,
+        price: 6200.00,
+        originalPrice: 7500.00,
         rating: 4.6,
         reviewsCount: 82,
         inStock: true,
@@ -487,8 +487,8 @@ const getInitialSeeds = () => {
         id: 'prod_12',
         title: 'Portofino Minimalist Leather Sneakers',
         category: 'Fashion',
-        price: 220.00,
-        originalPrice: 260.00,
+        price: 18500.00,
+        originalPrice: 22000.00,
         rating: 4.8,
         reviewsCount: 139,
         inStock: true,
@@ -526,44 +526,44 @@ const getInitialSeeds = () => {
         id: 'ord_1001',
         userId: 'usr_demo_1',
         customerName: 'Sophia Vance',
-        customerEmail: 'demo@aura.com',
+        customerEmail: 'demo@nikkaura.com',
         shippingAddress: {
           fullName: 'Sophia Vance',
-          street: '742 Evergreen Terrace',
-          city: 'San Francisco',
-          state: 'CA',
-          postalCode: '94107',
-          country: 'United States',
-          phone: '+1 (555) 019-2834'
+          street: '42 Marine Drive',
+          city: 'Mumbai',
+          state: 'Maharashtra',
+          postalCode: '400020',
+          country: 'India',
+          phone: '+91 98200 12345'
         },
         items: [
           {
             productId: 'prod_1',
-            title: 'Aura Studio Wireless ANC Headphones',
+            title: 'NIKK AURA Studio Wireless ANC Headphones',
             image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80',
-            price: 299.00,
+            price: 24999.00,
             quantity: 1,
             selectedColor: 'Matte Obsidian'
           },
           {
             productId: 'prod_8',
-            title: 'Aura Pure Ultrasonic Stone Diffuser',
+            title: 'NIKK AURA Pure Ultrasonic Stone Diffuser',
             image: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=800&q=80',
-            price: 110.00,
+            price: 9490.00,
             quantity: 1,
             selectedColor: 'Porecelain Sand'
           }
         ],
-        subtotal: 409.00,
-        discountAmount: 40.90,
+        subtotal: 34489.00,
+        discountAmount: 3448.90,
         appliedCoupon: 'WELCOME10',
         shippingFee: 0.00,
-        taxAmount: 29.45,
-        totalAmount: 397.55,
+        taxAmount: 1552.00,
+        totalAmount: 32592.10,
         status: 'shipped',
-        paymentMethod: 'Credit Card (Simulated)',
-        trackingNumber: 'AUR-9842104-EXP',
-        estimatedDelivery: '2026-11-08',
+        paymentMethod: 'UPI / Credit Card',
+        trackingNumber: 'NIKK-9842104-EXP',
+        estimatedDelivery: '2026-11-28',
         createdAt: '2026-11-01T14:32:00Z'
       }
     ]
@@ -604,6 +604,7 @@ class DataStore {
       console.log('Connecting to MongoDB Atlas...');
       await mongoose.connect(uri);
       this.isMongoConnected = true;
+      this.mongoError = null;
       console.log('✅ Connected to MongoDB Atlas successfully!');
 
       // Auto-seed MongoDB Atlas if empty
@@ -687,30 +688,69 @@ class DataStore {
     return this.data.users || [];
   }
 
-  findUserByEmail(email) {
+  async findUserByEmail(email) {
     if (!email) return null;
-    return this.getUsers().find(u => u.email.toLowerCase() === email.toLowerCase());
+    const lower = email.trim().toLowerCase();
+    
+    // Check in-memory / local cache first
+    const cached = this.getUsers().find(u => u.email && u.email.toLowerCase() === lower);
+    if (cached) return cached;
+
+    // Check MongoDB Atlas directly
+    if (this.isMongoConnected) {
+      try {
+        const u = await User.findOne({ email: lower }).lean();
+        if (u) {
+          const formatted = { id: u._id.toString(), ...u };
+          this.data.users.push(formatted);
+          return formatted;
+        }
+      } catch (err) {
+        console.error('MongoDB findUserByEmail error:', err.message);
+      }
+    }
+
+    return null;
   }
 
-  findUserById(id) {
-    return this.getUsers().find(u => u.id === id);
+  async findUserById(id) {
+    const cached = this.getUsers().find(u => u.id === id);
+    if (cached) return cached;
+
+    if (this.isMongoConnected && mongoose.Types.ObjectId.isValid(id)) {
+      try {
+        const u = await User.findById(id).lean();
+        if (u) return { id: u._id.toString(), ...u };
+      } catch (e) {}
+    }
+    return null;
   }
 
-  createUser(userData) {
+  async createUser(userData) {
     const newUser = {
       id: `usr_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
       role: 'customer',
       createdAt: new Date().toISOString(),
       ...userData
     };
-    this.data.users.push(newUser);
-    this.persist();
 
-    // Async write to MongoDB Atlas
+    // Save directly to MongoDB Atlas
     if (this.isMongoConnected) {
-      User.create(userData).catch(err => console.error('MongoDB User create error:', err.message));
+      try {
+        const doc = await User.create({
+          name: userData.name,
+          email: userData.email,
+          password: userData.password,
+          role: userData.role || 'customer'
+        });
+        newUser.id = doc._id.toString();
+      } catch (err) {
+        console.error('MongoDB User create error:', err.message);
+      }
     }
 
+    this.data.users.push(newUser);
+    this.persist();
     return newUser;
   }
 
@@ -842,7 +882,7 @@ class DataStore {
     const newOrder = {
       id: `ord_${Date.now()}`,
       status: 'processing',
-      trackingNumber: `AUR-${Math.floor(1000000 + Math.random() * 9000000)}-EXP`,
+      trackingNumber: `NIKK-${Math.floor(1000000 + Math.random() * 9000000)}-EXP`,
       createdAt: new Date().toISOString(),
       ...orderData
     };

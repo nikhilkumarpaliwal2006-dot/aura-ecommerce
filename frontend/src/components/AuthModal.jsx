@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { X, Lock, Mail, User, Shield, Sparkles } from 'lucide-react';
 
-export default function AuthModal({ isOpen, onClose }) {
+export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   if (!isOpen) return null;
 
   const { login, register, quickDemoLogin } = useAuth();
@@ -22,12 +22,16 @@ export default function AuthModal({ isOpen, onClose }) {
     setLoading(true);
 
     try {
+      let res;
       if (isSignUp) {
-        await register(name, email, password);
-        showToast('Welcome to Aura! Account created.');
+        res = await register(name, email, password);
+        showToast('Welcome to NIKK AURA! Account created & saved.');
       } else {
-        await login(email, password);
-        showToast('Welcome back!');
+        res = await login(email, password);
+        showToast('Welcome back to NIKK AURA!');
+      }
+      if (res?.success && onLoginSuccess) {
+        onLoginSuccess(res.user);
       }
       onClose();
     } catch (err) {
@@ -41,8 +45,11 @@ export default function AuthModal({ isOpen, onClose }) {
     setError('');
     setLoading(true);
     try {
-      await quickDemoLogin(role);
+      const res = await quickDemoLogin(role);
       showToast(`Logged in as ${role === 'admin' ? 'Store Administrator' : 'Demo Customer'}`);
+      if (res?.success && onLoginSuccess) {
+        onLoginSuccess(res.user);
+      }
       onClose();
     } catch (err) {
       setError(err.message || 'Demo login failed');
@@ -65,11 +72,11 @@ export default function AuthModal({ isOpen, onClose }) {
 
         {/* Header Branding */}
         <div className="p-8 pb-4 text-center">
-          <div className="w-12 h-12 bg-zinc-900 text-white rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg font-bold text-xl">
-            A
+          <div className="w-12 h-12 bg-zinc-900 text-amber-400 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-lg font-serif font-black text-xl">
+            NA
           </div>
           <h2 className="text-xl font-extrabold text-zinc-900 tracking-tight">
-            {isSignUp ? 'Create your Aura Account' : 'Sign in to Aura'}
+            {isSignUp ? 'Create your NIKK AURA Account' : 'Sign in to NIKK AURA'}
           </h2>
           <p className="text-xs text-zinc-500 mt-1">
             Access order history, receipts, and fast checkout

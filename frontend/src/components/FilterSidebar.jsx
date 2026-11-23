@@ -43,21 +43,21 @@ export default function FilterSidebar({
           {/* Price Range */}
           <div>
             <label className="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-3">
-              Maximum Price: <strong className="text-zinc-900">${priceRange}</strong>
+              Maximum Price: <strong className="text-zinc-900">₹{priceRange.toLocaleString('en-IN')}</strong>
             </label>
             <input
               type="range"
-              min="50"
-              max="600"
-              step="25"
+              min="2000"
+              max="60000"
+              step="1000"
               value={priceRange}
               onChange={(e) => onPriceChange(Number(e.target.value))}
               className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-zinc-900"
             />
             <div className="flex justify-between text-xs text-zinc-400 mt-2 font-medium">
-              <span>$50</span>
-              <span>$300</span>
-              <span>$600+</span>
+              <span>₹2,000</span>
+              <span>₹30,000</span>
+              <span>₹60,000+</span>
             </div>
           </div>
 

@@ -37,14 +37,14 @@ export default function CheckoutModal({ isOpen, onClose, onOrderPlaced }) {
 
   // Form states
   const [formData, setFormData] = useState({
-    fullName: user?.name || 'Sophia Vance',
-    email: user?.email || 'demo@aura.com',
-    street: '742 Evergreen Terrace',
-    city: 'San Francisco',
-    state: 'CA',
-    postalCode: '94107',
-    country: 'United States',
-    phone: '+1 (555) 019-2834',
+    fullName: user?.name || 'Nikhil Paliwal',
+    email: user?.email || 'nikhil@example.com',
+    street: 'B-402, Royal Palms, Western Express Hwy',
+    city: 'Mumbai',
+    state: 'Maharashtra',
+    postalCode: '400063',
+    country: 'India',
+    phone: '+91 98765 43210',
     cardNumber: '4242 •••• •••• 4242',
     cardExp: '12/28',
     cardCvc: '888'
@@ -56,7 +56,7 @@ export default function CheckoutModal({ isOpen, onClose, onOrderPlaced }) {
 
   // Calculations for current checkout
   const isExpress = deliverySpeed === 'express';
-  const shippingFee = isExpress ? 15.00 : (subtotal >= 100 ? 0.00 : 9.99);
+  const shippingFee = isExpress ? 499.00 : (subtotal >= 2499 ? 0.00 : 199.00);
   const totalAmount = parseFloat((Math.max(0, subtotal - discountAmount) + shippingFee + taxAmount).toFixed(2));
 
   const handlePlaceOrder = async () => {
@@ -123,7 +123,7 @@ export default function CheckoutModal({ isOpen, onClose, onOrderPlaced }) {
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-emerald-600" />
             <h2 className="text-base sm:text-lg font-extrabold text-zinc-900 tracking-tight">
-              {completedOrder ? 'Order Confirmation & Receipt' : 'Aura Express Checkout'}
+              {completedOrder ? 'Order Confirmation & Receipt' : 'NIKK AURA Express Checkout'}
             </h2>
           </div>
           <button
@@ -175,7 +175,7 @@ export default function CheckoutModal({ isOpen, onClose, onOrderPlaced }) {
                 </div>
                 <div className="flex justify-between pt-2 border-t border-zinc-200 text-sm font-extrabold">
                   <span>Total Amount Paid:</span>
-                  <span className="text-base text-zinc-900">${completedOrder.totalAmount.toFixed(2)}</span>
+                  <span className="text-base text-zinc-900">₹{completedOrder.totalAmount.toLocaleString('en-IN')}</span>
                 </div>
               </div>
 
@@ -187,7 +187,7 @@ export default function CheckoutModal({ isOpen, onClose, onOrderPlaced }) {
                     <img src={it.image} alt="" className="w-10 h-10 object-cover rounded-lg" />
                     <div className="flex-1 min-w-0 text-xs">
                       <div className="font-bold text-zinc-900 truncate">{it.title}</div>
-                      <div className="text-zinc-500">Qty: {it.quantity} · ${(it.price * it.quantity).toFixed(2)}</div>
+                      <div className="text-zinc-500">Qty: {it.quantity} · ₹{(it.price * it.quantity).toLocaleString('en-IN')}</div>
                     </div>
                   </div>
                 ))}
@@ -353,7 +353,7 @@ export default function CheckoutModal({ isOpen, onClose, onOrderPlaced }) {
                         </div>
                       </div>
                       <span className="text-xs font-bold text-zinc-900">
-                        {subtotal >= 100 ? 'FREE' : '$9.99'}
+                        {subtotal >= 2499 ? 'FREE' : '₹199'}
                       </span>
                     </label>
 
@@ -383,7 +383,7 @@ export default function CheckoutModal({ isOpen, onClose, onOrderPlaced }) {
                           <div className="text-[11px] text-zinc-500">Guaranteed delivery in 1-2 business days</div>
                         </div>
                       </div>
-                      <span className="text-xs font-bold text-zinc-900">$15.00</span>
+                      <span className="text-xs font-bold text-zinc-900">₹499</span>
                     </label>
                   </div>
 
@@ -483,25 +483,25 @@ export default function CheckoutModal({ isOpen, onClose, onOrderPlaced }) {
                   <div className="p-4 bg-zinc-50 rounded-2xl border border-zinc-200 space-y-1.5 text-xs text-zinc-600">
                     <div className="flex justify-between">
                       <span>Subtotal ({cart.length} items)</span>
-                      <span>${subtotal.toFixed(2)}</span>
+                      <span>₹{subtotal.toLocaleString('en-IN')}</span>
                     </div>
                     {discountAmount > 0 && (
                       <div className="flex justify-between text-emerald-600 font-semibold">
                         <span>Discount ({coupon?.code})</span>
-                        <span>-${discountAmount.toFixed(2)}</span>
+                        <span>-₹{discountAmount.toLocaleString('en-IN')}</span>
                       </div>
                     )}
                     <div className="flex justify-between">
                       <span>Shipping ({deliverySpeed})</span>
-                      <span>${shippingFee.toFixed(2)}</span>
+                      <span>₹{shippingFee.toLocaleString('en-IN')}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Estimated Tax (7.25%)</span>
-                      <span>${taxAmount.toFixed(2)}</span>
+                      <span>Estimated GST (5%)</span>
+                      <span>₹{taxAmount.toLocaleString('en-IN')}</span>
                     </div>
                     <div className="flex justify-between text-sm font-extrabold text-zinc-900 pt-2 border-t border-zinc-200">
                       <span>Total to Authorize</span>
-                      <span className="text-base">${totalAmount.toFixed(2)}</span>
+                      <span className="text-base">₹{totalAmount.toLocaleString('en-IN')}</span>
                     </div>
                   </div>
 
@@ -521,7 +521,7 @@ export default function CheckoutModal({ isOpen, onClose, onOrderPlaced }) {
                         <span>Authorizing Transaction...</span>
                       ) : (
                         <>
-                          <span>Place Order · ${totalAmount.toFixed(2)}</span>
+                          <span>Place Order · ₹{totalAmount.toLocaleString('en-IN')}</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </>
                       )}

@@ -23,7 +23,7 @@ export default function Footer({ onCategoryClick, onOpenOrders }) {
               PRIVILEGED DISPATCH
             </span>
             <h3 className="text-2xl font-extrabold tracking-tight">
-              Join the Aura Inner Circle
+              Join the NIKK AURA Inner Circle
             </h3>
             <p className="text-zinc-400 text-xs mt-1 max-w-md">
               Receive private previews of limited seasonal releases, acoustic engineering monographs, and invitations to private trunk sales.
@@ -91,7 +91,7 @@ export default function Footer({ onCategoryClick, onOpenOrders }) {
 
           <div>
             <h4 className="font-bold text-zinc-200 uppercase tracking-wider text-[11px] mb-4">
-              The Aura Atelier
+              The NIKK AURA Atelier
             </h4>
             <ul className="space-y-2.5 text-zinc-400">
               <li><a href="#" className="hover:text-white transition-colors">Acoustic Transducer Labs</a></li>
@@ -106,8 +106,8 @@ export default function Footer({ onCategoryClick, onOpenOrders }) {
               Corporate Headquarters
             </h4>
             <div className="space-y-2 text-zinc-400 leading-relaxed">
-              <p>742 Montgomery St, Suite 400<br />San Francisco, CA 94111</p>
-              <p className="pt-2">concierge@aura-living.com<br />+1 (800) 892-AURA</p>
+              <p>Palacio Towers, Bandra Kurla Complex<br />Mumbai, Maharashtra 400051, India</p>
+              <p className="pt-2">concierge@nikkaura.com<br />+91 (800) 123-NIKK</p>
             </div>
           </div>
         </div>
@@ -115,7 +115,7 @@ export default function Footer({ onCategoryClick, onOpenOrders }) {
         {/* Bottom Legal Strip */}
         <div className="pt-8 border-t border-zinc-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
           <div>
-            © 2026 Aura Living & Co. All rights reserved.
+            © 2026 NIKK AURA Living & Co. All rights reserved.
           </div>
           <div className="flex items-center gap-6">
             <span className="flex items-center gap-1.5 text-zinc-400">

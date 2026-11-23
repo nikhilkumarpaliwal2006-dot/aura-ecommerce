@@ -153,15 +153,15 @@ export default function ProductModal({ product, onClose, onProductUpdated }) {
                 {/* Price display */}
                 <div className="flex items-baseline gap-3 mb-4">
                   <span className="text-2xl font-black text-zinc-900">
-                    ${product.price.toFixed(2)}
+                    ₹{product.price.toLocaleString('en-IN')}
                   </span>
                   {product.originalPrice && product.originalPrice > product.price && (
                     <>
                       <span className="text-base text-zinc-400 line-through">
-                        ${product.originalPrice.toFixed(2)}
+                        ₹{product.originalPrice.toLocaleString('en-IN')}
                       </span>
                       <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">
-                        Save ${(product.originalPrice - product.price).toFixed(2)}
+                        Save ₹{(product.originalPrice - product.price).toLocaleString('en-IN')}
                       </span>
                     </>
                   )}
@@ -254,7 +254,7 @@ export default function ProductModal({ product, onClose, onProductUpdated }) {
                     className="flex-1 py-3 px-6 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-sm rounded-xl transition-all shadow-lg hover:shadow-xl active:scale-98 flex items-center justify-center gap-2"
                   >
                     <ShoppingBag className="w-4 h-4" />
-                    <span>Add to Bag · ${(product.price * quantity).toFixed(2)}</span>
+                    <span>Add to Bag · ₹{(product.price * quantity).toLocaleString('en-IN')}</span>
                   </button>
 
                   <button

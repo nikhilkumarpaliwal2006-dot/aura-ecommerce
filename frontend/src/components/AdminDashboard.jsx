@@ -125,7 +125,7 @@ export default function AdminDashboard({ isOpen, onClose, onRefreshCatalog }) {
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-extrabold text-zinc-900 tracking-tight">
-                Aura Store Administration & Inventory
+                NIKK AURA Store Administration & Inventory
               </h2>
               <p className="text-xs text-zinc-500">Live operational command center</p>
             </div>
@@ -150,7 +150,7 @@ export default function AdminDashboard({ isOpen, onClose, onRefreshCatalog }) {
                   <TrendingUp className="w-4 h-4 text-emerald-600" />
                 </div>
                 <div className="text-xl sm:text-2xl font-black text-zinc-900">
-                  ${analytics.totalRevenue.toFixed(2)}
+                  ₹{analytics.totalRevenue.toLocaleString('en-IN')}
                 </div>
                 <div className="text-[10px] text-zinc-400 mt-1">Simulated revenue</div>
               </div>
@@ -249,7 +249,7 @@ export default function AdminDashboard({ isOpen, onClose, onRefreshCatalog }) {
                         {order.items?.length || 0} pieces
                       </td>
                       <td className="py-3 px-3 font-bold text-zinc-900">
-                        ${order.totalAmount?.toFixed(2)}
+                        ₹{order.totalAmount?.toLocaleString('en-IN')}
                       </td>
                       <td className="py-3 px-3">
                         <span className={`px-2.5 py-1 text-[10px] font-bold rounded-full ${
@@ -322,23 +322,23 @@ export default function AdminDashboard({ isOpen, onClose, onRefreshCatalog }) {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-zinc-600 font-semibold mb-1">Price ($)</label>
+                      <label className="block text-zinc-600 font-semibold mb-1">Price (₹)</label>
                       <input
                         type="number"
-                        step="0.01"
+                        step="1"
                         required
-                        placeholder="299.00"
+                        placeholder="24900"
                         value={newProd.price}
                         onChange={(e) => setNewProd({ ...newProd, price: e.target.value })}
                         className="w-full p-2.5 bg-white border border-zinc-200 rounded-xl"
                       />
                     </div>
                     <div>
-                      <label className="block text-zinc-600 font-semibold mb-1">Original Price ($ optional)</label>
+                      <label className="block text-zinc-600 font-semibold mb-1">Original Price (₹ optional)</label>
                       <input
                         type="number"
-                        step="0.01"
-                        placeholder="349.00"
+                        step="1"
+                        placeholder="28900"
                         value={newProd.originalPrice}
                         onChange={(e) => setNewProd({ ...newProd, originalPrice: e.target.value })}
                         className="w-full p-2.5 bg-white border border-zinc-200 rounded-xl"
@@ -423,7 +423,7 @@ export default function AdminDashboard({ isOpen, onClose, onRefreshCatalog }) {
                           </div>
                         </td>
                         <td className="py-3 px-3 text-zinc-600">{prod.category}</td>
-                        <td className="py-3 px-3 font-bold text-zinc-900">${prod.price.toFixed(2)}</td>
+                        <td className="py-3 px-3 font-bold text-zinc-900">₹{prod.price.toLocaleString('en-IN')}</td>
                         <td className="py-3 px-3">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                             prod.stockQuantity < 15 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
@@ -465,7 +465,7 @@ export default function AdminDashboard({ isOpen, onClose, onRefreshCatalog }) {
                       <div key={cat} className="space-y-1">
                         <div className="flex justify-between font-semibold">
                           <span>{cat}</span>
-                          <span>${rev.toFixed(2)} ({percent}%)</span>
+                          <span>₹{rev.toLocaleString('en-IN')} ({percent}%)</span>
                         </div>
                         <div className="w-full h-2 bg-zinc-200 rounded-full overflow-hidden">
                           <div className="h-full bg-zinc-900 rounded-full" style={{ width: `${percent}%` }}></div>

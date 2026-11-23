@@ -16,7 +16,7 @@ exports.validateCoupon = (req, res) => {
   if (orderSubtotal < coupon.minOrderAmount) {
     return res.status(400).json({
       success: false,
-      message: `Coupon requires a minimum order subtotal of $${coupon.minOrderAmount.toFixed(2)}`
+      message: `Coupon requires a minimum order subtotal of ₹${coupon.minOrderAmount.toLocaleString('en-IN')}`
     });
   }
 
