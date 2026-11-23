@@ -92,7 +92,7 @@ export default function HeroSlider({ onExploreClick, onQuickView }) {
       videoRef.current.pause();
       setIsPlaying(false);
     } else {
-      videoRef.current.play();
+      videoRef.current.play().catch(() => {});
       setIsPlaying(true);
     }
   };

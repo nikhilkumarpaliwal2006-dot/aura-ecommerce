@@ -58,7 +58,7 @@ export default function VideoProductSpotlight({ product, onQuickView }) {
       videoRef.current.pause();
       setIsPlaying(false);
     } else {
-      videoRef.current.play();
+      videoRef.current.play().catch(() => {});
       setIsPlaying(true);
     }
   };
