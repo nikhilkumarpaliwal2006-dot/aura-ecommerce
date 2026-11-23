@@ -3,7 +3,7 @@ const config = require('../config');
 const store = require('../db/store');
 
 // Middleware to authenticate user via JWT
-const authenticateToken = (req, res, next) => {
+const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -13,7 +13,7 @@ const authenticateToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, config.JWT_SECRET);
-    const user = store.findUserById(decoded.id);
+    const user = await store.findUserById(decoded.id);
     if (!user) {
       return res.status(401).json({ success: false, message: 'User session not found or expired' });
     }
@@ -28,14 +28,14 @@ const authenticateToken = (req, res, next) => {
 };
 
 // Optional auth: if token is present, decode it; if not, proceed as guest
-const optionalAuth = (req, res, next) => {
+const optionalAuth = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
   if (token) {
     try {
       const decoded = jwt.verify(token, config.JWT_SECRET);
-      const user = store.findUserById(decoded.id);
+      const user = await store.findUserById(decoded.id);
       if (user) {
         const { password, ...userWithoutPassword } = user;
         req.user = userWithoutPassword;

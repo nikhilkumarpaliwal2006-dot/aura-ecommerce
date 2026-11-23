@@ -46,7 +46,11 @@ export default function ProductModal({ product, onClose, onProductUpdated }) {
       const res = await api.addReview(product.id, {
         rating: newRating,
         comment: newComment,
-        userName: user ? user.name : 'Verified Customer'
+        userName: (typeof user?.name === 'string' && user.name.trim()) 
+          ? user.name 
+          : ((typeof user?.email === 'string' && user.email.includes('@')) 
+            ? user.email.split('@')[0] 
+            : 'Verified Customer')
       });
       if (res.success) {
         showToast('Review submitted successfully!');

@@ -37,7 +37,11 @@ export default function PostLoginAnimation({ user, onComplete }) {
     };
   }, [onComplete]);
 
-  const userName = user?.name ? user.name.split(' ')[0] : 'Valued Collector';
+  const userName = (typeof user?.name === 'string' && user.name.trim()) 
+    ? user.name.trim().split(' ')[0] 
+    : ((typeof user?.email === 'string' && user.email.includes('@')) 
+      ? user.email.split('@')[0] 
+      : 'Valued Collector');
 
   return (
     <div

@@ -165,7 +165,11 @@ export default function Navbar({
                 >
                   <User className="w-5 h-5" />
                   <span className="text-xs font-semibold hidden md:inline">
-                    {isAuthenticated ? user.name.split(' ')[0] : 'Sign In'}
+                    {isAuthenticated 
+                      ? (typeof user?.name === 'string' && user.name.trim() 
+                          ? user.name.trim().split(' ')[0] 
+                          : (typeof user?.email === 'string' ? user.email.split('@')[0] : 'Member'))
+                      : 'Sign In'}
                   </span>
                   <ChevronDown className="w-3.5 h-3.5 text-zinc-400 hidden md:inline" />
                 </button>
@@ -176,8 +180,10 @@ export default function Navbar({
                       <>
                         <div className="px-4 py-3 border-b border-zinc-100">
                           <div className="text-xs text-zinc-500">Signed in as</div>
-                          <div className="text-sm font-bold text-zinc-900 truncate">{user.name}</div>
-                          <div className="text-xs text-zinc-400 truncate">{user.email}</div>
+                          <div className="text-sm font-bold text-zinc-900 truncate">
+                            {user?.name || (typeof user?.email === 'string' ? user.email.split('@')[0] : 'Valued Member')}
+                          </div>
+                          <div className="text-xs text-zinc-400 truncate">{user?.email || ''}</div>
                           {isAdmin && (
                             <span className="inline-block mt-1 px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-full">
                               Administrator

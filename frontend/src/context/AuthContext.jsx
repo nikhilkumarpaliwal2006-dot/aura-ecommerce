@@ -8,12 +8,18 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem('aura_token'));
   const [loading, setLoading] = useState(true);
 
+  const normalizeUser = (u) => {
+    if (!u) return null;
+    const name = u.name || (u.email ? u.email.split('@')[0] : 'Collector');
+    return { ...u, name };
+  };
+
   useEffect(() => {
     if (token) {
       api.getMe()
         .then(res => {
-          if (res.success) {
-            setUser(res.user);
+          if (res.success && res.user) {
+            setUser(normalizeUser(res.user));
           } else {
             logout();
           }
@@ -30,7 +36,7 @@ export const AuthProvider = ({ children }) => {
     if (res.success) {
       localStorage.setItem('aura_token', res.token);
       setToken(res.token);
-      setUser(res.user);
+      setUser(normalizeUser(res.user));
     }
     return res;
   };
@@ -40,7 +46,7 @@ export const AuthProvider = ({ children }) => {
     if (res.success) {
       localStorage.setItem('aura_token', res.token);
       setToken(res.token);
-      setUser(res.user);
+      setUser(normalizeUser(res.user));
     }
     return res;
   };
