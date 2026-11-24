@@ -73,8 +73,17 @@ export default function VideoProductSpotlight({ product, onQuickView, onDirectBu
 
   const handleDirectBuy = () => {
     soundManager.playDirectBuy();
+    const targetProduct = (product && product.id === current.productId) ? product : {
+      id: current.productId,
+      title: current.title,
+      price: current.price,
+      image: current.productId === 'prod_1' 
+        ? 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80'
+        : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
+      category: 'Electronics'
+    };
     if (onDirectBuy) {
-      onDirectBuy(current.productId);
+      onDirectBuy(targetProduct);
     } else if (onQuickView) {
       onQuickView(current.productId);
     }

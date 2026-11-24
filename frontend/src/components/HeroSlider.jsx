@@ -109,8 +109,16 @@ export default function HeroSlider({ onExploreClick, onQuickView, onDirectBuy })
   const handleDirectBuyClick = (e, productId) => {
     e.stopPropagation();
     soundManager.playDirectBuy();
+    const cleanPrice = parseInt(slide.highlight.replace(/[^0-9]/g, ''), 10) || 24999;
+    const directObj = {
+      id: productId,
+      title: slide.productName,
+      price: cleanPrice,
+      category: 'Luxury Essentials',
+      image: slide.image
+    };
     if (onDirectBuy) {
-      onDirectBuy(productId);
+      onDirectBuy(directObj);
     } else if (onQuickView) {
       onQuickView(productId);
     }

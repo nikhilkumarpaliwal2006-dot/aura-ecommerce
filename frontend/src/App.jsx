@@ -116,9 +116,14 @@ function ShopContent() {
   const handleDirectBuy = (productIdOrObj, options = {}) => {
     let target = null;
     if (typeof productIdOrObj === 'string') {
-      target = products.find(p => p.id === productIdOrObj);
+      target = products.find(p => p.id === productIdOrObj || p.title?.toLowerCase().includes(productIdOrObj.toLowerCase())) ||
+               products[0];
     } else if (productIdOrObj && typeof productIdOrObj === 'object') {
       target = productIdOrObj;
+    }
+
+    if (!target && products.length > 0) {
+      target = products[0];
     }
 
     if (target) {
@@ -130,25 +135,31 @@ function ShopContent() {
 
   const handleLocateProduct = (productId) => {
     soundManager.playTap();
-    const target = products.find(p => p.id === productId);
-    if (target && selectedCategory !== 'All' && target.category !== selectedCategory) {
-      setSelectedCategory('All');
+    let target = products.find(p => p.id === productId);
+    if (!target) {
+      target = products.find(p => p.title?.toLowerCase().includes(String(productId).toLowerCase()));
     }
 
-    setHighlightedProductId(productId);
-
-    setTimeout(() => {
-      const el = document.getElementById(`product-card-${productId}`);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      } else if (catalogRef.current) {
-        catalogRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (target) {
+      if (selectedCategory !== 'All' && target.category !== selectedCategory) {
+        setSelectedCategory('All');
       }
-    }, 120);
 
-    setTimeout(() => {
-      setHighlightedProductId(curr => (curr === productId ? null : curr));
-    }, 4500);
+      setHighlightedProductId(target.id);
+
+      setTimeout(() => {
+        const el = document.getElementById(`product-card-${target.id}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else if (catalogRef.current) {
+          catalogRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 120);
+
+      setTimeout(() => {
+        setHighlightedProductId(curr => (curr === target.id ? null : curr));
+      }, 4500);
+    }
   };
 
   const scrollToCatalog = () => {
