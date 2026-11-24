@@ -12,10 +12,12 @@ import {
   Truck,
   RotateCcw,
   Sparkles,
-  MessageSquarePlus
+  MessageSquarePlus,
+  Zap
 } from 'lucide-react';
+import { soundManager } from '../utils/audio';
 
-export default function ProductModal({ product, onClose, onProductUpdated }) {
+export default function ProductModal({ product, onClose, onProductUpdated, onDirectBuy }) {
   if (!product) return null;
 
   const { addToCart, toggleWishlist, isWishlisted, showToast } = useCart();
@@ -34,7 +36,18 @@ export default function ProductModal({ product, onClose, onProductUpdated }) {
   const images = product.gallery && product.gallery.length > 0 ? product.gallery : [product.image];
 
   const handleAdd = () => {
+    soundManager.playAddToCart();
     addToCart(product, quantity, { color: selectedColor, size: selectedSize });
+  };
+
+  const handleDirectBuy = () => {
+    soundManager.playDirectBuy();
+    if (onDirectBuy) {
+      onDirectBuy(product.id || product, { color: selectedColor, size: selectedSize, quantity });
+    } else {
+      addToCart(product, quantity, { color: selectedColor, size: selectedSize });
+    }
+    if (onClose) onClose();
   };
 
   const handleReviewSubmit = async (e) => {
@@ -234,43 +247,63 @@ export default function ProductModal({ product, onClose, onProductUpdated }) {
                 )}
 
                 {/* Quantity and Actions */}
-                <div className="flex items-center gap-4 pt-4 border-t border-zinc-100">
-                  <div className="flex items-center border border-zinc-200 rounded-xl bg-zinc-50 overflow-hidden">
+                <div className="space-y-3 pt-4 border-t border-zinc-100">
+                  {/* Direct Buy Now Button */}
+                  <button
+                    onClick={handleDirectBuy}
+                    className="w-full py-3.5 px-6 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-bold text-sm rounded-xl transition-all shadow-lg shadow-amber-500/20 hover:scale-101 active:scale-99 flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Zap className="w-4 h-4 fill-zinc-950" />
+                    <span>Direct Buy Now • ₹{(product.price * quantity).toLocaleString('en-IN')}</span>
+                  </button>
+
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center border border-zinc-200 rounded-xl bg-zinc-50 overflow-hidden">
+                      <button
+                        onClick={() => {
+                          soundManager.playTap();
+                          setQuantity(Math.max(1, quantity - 1));
+                        }}
+                        className="px-3.5 py-2.5 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60 font-bold transition-colors cursor-pointer"
+                      >
+                        -
+                      </button>
+                      <span className="w-10 text-center font-bold text-sm text-zinc-900">
+                        {quantity}
+                      </span>
+                      <button
+                        onClick={() => {
+                          soundManager.playTap();
+                          setQuantity(Math.min(product.stockQuantity || 99, quantity + 1));
+                        }}
+                        className="px-3.5 py-2.5 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60 font-bold transition-colors cursor-pointer"
+                      >
+                        +
+                      </button>
+                    </div>
+
                     <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="px-3.5 py-2.5 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60 font-bold transition-colors"
+                      onClick={handleAdd}
+                      className="flex-1 py-3 px-4 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      -
+                      <ShoppingBag className="w-4 h-4" />
+                      <span>Add to Bag</span>
                     </button>
-                    <span className="w-10 text-center font-bold text-sm text-zinc-900">
-                      {quantity}
-                    </span>
+
                     <button
-                      onClick={() => setQuantity(Math.min(product.stockQuantity || 99, quantity + 1))}
-                      className="px-3.5 py-2.5 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200/60 font-bold transition-colors"
+                      onClick={() => {
+                        soundManager.playTap();
+                        toggleWishlist(product);
+                      }}
+                      className={`p-3 rounded-xl border transition-all cursor-pointer ${
+                        wishlisted
+                          ? 'border-rose-200 bg-rose-50 text-rose-500'
+                          : 'border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300 hover:text-zinc-900'
+                      }`}
                     >
-                      +
+                      <Heart className={`w-5 h-5 ${wishlisted ? 'fill-rose-500' : ''}`} />
                     </button>
                   </div>
-
-                  <button
-                    onClick={handleAdd}
-                    className="flex-1 py-3 px-6 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-sm rounded-xl transition-all shadow-lg hover:shadow-xl active:scale-98 flex items-center justify-center gap-2"
-                  >
-                    <ShoppingBag className="w-4 h-4" />
-                    <span>Add to Bag · ₹{(product.price * quantity).toLocaleString('en-IN')}</span>
-                  </button>
-
-                  <button
-                    onClick={() => toggleWishlist(product)}
-                    className={`p-3 rounded-xl border transition-all ${
-                      wishlisted
-                        ? 'border-rose-200 bg-rose-50 text-rose-500'
-                        : 'border-zinc-200 bg-white text-zinc-600 hover:border-zinc-300 hover:text-zinc-900'
-                    }`}
-                  >
-                    <Heart className={`w-5 h-5 ${wishlisted ? 'fill-rose-500' : ''}`} />
-                  </button>
                 </div>
               </div>
 

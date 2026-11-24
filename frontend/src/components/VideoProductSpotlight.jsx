@@ -1,8 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useCart } from '../context/CartContext';
 import {
-  Play,
-  Pause,
   Volume2,
   VolumeX,
   Sparkles,
@@ -11,22 +9,24 @@ import {
   CheckCircle2,
   Zap,
   Activity,
-  Shield
+  Shield,
+  ArrowRight
 } from 'lucide-react';
+import { soundManager } from '../utils/audio';
 
-export default function VideoProductSpotlight({ product, onQuickView }) {
+export default function VideoProductSpotlight({ product, onQuickView, onDirectBuy }) {
   const { addToCart } = useCart();
-  const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [activeTab, setActiveTab] = useState('headphones'); // 'headphones' | 'watch'
   const videoRef = useRef(null);
 
   const videoData = {
     headphones: {
-      title: 'NIKK AURA Studio Wireless Headphones',
+      productId: 'prod_1',
+      title: 'NIKK AURA Studio Wireless ANC Headphones',
       tagline: 'Pure Acoustic Silence. Milled Aluminum & Hand-Stitched Leather.',
-      price: 24900,
-      originalPrice: 29900,
+      price: 24999,
+      originalPrice: 29999,
       videoSrc: '/videos/headphones.mp4',
       fallbackSrc: 'https://assets.mixkit.co/videos/5452/5452-720.mp4',
       features: [
@@ -36,10 +36,11 @@ export default function VideoProductSpotlight({ product, onQuickView }) {
       ]
     },
     watch: {
-      title: 'Chronos Minimalist Titanium Smartwatch',
+      productId: 'prod_2',
+      title: 'Chronos Sapphire Minimalist Smartwatch',
       tagline: 'Grade-5 Aerospace Titanium. Sapphire Crystal Dial.',
-      price: 32500,
-      originalPrice: 38500,
+      price: 32490,
+      originalPrice: 36990,
       videoSrc: '/videos/watch.mp4',
       fallbackSrc: 'https://assets.mixkit.co/videos/9104/9104-720.mp4',
       features: [
@@ -52,29 +53,45 @@ export default function VideoProductSpotlight({ product, onQuickView }) {
 
   const current = videoData[activeTab];
 
-  const togglePlay = () => {
-    if (!videoRef.current) return;
-    if (isPlaying) {
-      videoRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      videoRef.current.play().catch(() => {});
-      setIsPlaying(true);
-    }
-  };
-
   const toggleMute = () => {
     if (!videoRef.current) return;
-    videoRef.current.muted = !isMuted;
-    setIsMuted(!isMuted);
+    const nextMuted = !isMuted;
+    videoRef.current.muted = nextMuted;
+    setIsMuted(nextMuted);
+
+    if (!nextMuted) {
+      soundManager.playAmbientTone();
+    } else {
+      soundManager.playTap();
+    }
   };
 
-  const handleOrder = () => {
-    if (product) {
-      addToCart(product, 1);
+  const handleTabChange = (tab) => {
+    soundManager.playTap();
+    setActiveTab(tab);
+  };
+
+  const handleDirectBuy = () => {
+    soundManager.playDirectBuy();
+    if (onDirectBuy) {
+      onDirectBuy(current.productId);
     } else if (onQuickView) {
-      onQuickView(activeTab === 'headphones' ? 'prod_1' : 'prod_2');
+      onQuickView(current.productId);
     }
+  };
+
+  const handleAddToCart = () => {
+    soundManager.playAddToCart();
+    const targetProduct = product && product.id === current.productId ? product : {
+      id: current.productId,
+      title: current.title,
+      price: current.price,
+      image: current.productId === 'prod_1' 
+        ? 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80'
+        : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
+      stockQuantity: 20
+    };
+    addToCart(targetProduct, 1);
   };
 
   return (
@@ -82,7 +99,7 @@ export default function VideoProductSpotlight({ product, onQuickView }) {
       {/* Decorative Outer Shell */}
       <div className="relative rounded-3xl overflow-hidden bg-zinc-950 border border-zinc-800 shadow-2xl text-white">
         
-        {/* Background Looping Video with Ambient Gradient */}
+        {/* Background Looping Video: Always Playing, No Pause */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <video
             ref={videoRef}
@@ -98,70 +115,74 @@ export default function VideoProductSpotlight({ product, onQuickView }) {
           </video>
 
           {/* Vignette Gradients */}
-          <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/80 to-zinc-950/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-zinc-950/60" />
-
-          {/* Glowing Radial Orb */}
-          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[140px] pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-zinc-950/40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/60 to-transparent" />
         </div>
 
         {/* Foreground Content */}
-        <div className="relative z-10 p-8 sm:p-12 lg:p-16 flex flex-col justify-between min-h-[520px]">
+        <div className="relative z-10 p-6 sm:p-10 lg:p-14">
           
-          {/* Top Bar: Selector Tabs & Video Controls */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pb-8 border-b border-zinc-800/80">
+          {/* Top Bar: Selector Tabs & Sound Control */}
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800/80 pb-6">
             
-            {/* Tab Pill Switcher */}
-            <div className="inline-flex p-1 bg-zinc-900/90 rounded-2xl border border-zinc-800 backdrop-blur-md">
+            {/* Tabs Toggle */}
+            <div className="flex items-center gap-2 p-1 bg-zinc-900/90 backdrop-blur-md rounded-2xl border border-zinc-800">
               <button
-                type="button"
-                onClick={() => setActiveTab('headphones')}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                onClick={() => handleTabChange('headphones')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
                   activeTab === 'headphones'
-                    ? 'bg-amber-400 text-zinc-950 shadow-md shadow-amber-400/20'
+                    ? 'bg-amber-400 text-zinc-950 shadow-md shadow-amber-500/20'
                     : 'text-zinc-400 hover:text-white'
                 }`}
               >
-                🎧 Headphones 360° Video
+                <span>Studio Headphones</span>
+                <span className="text-[10px] opacity-75 font-mono">₹24,999</span>
               </button>
+
               <button
-                type="button"
-                onClick={() => setActiveTab('watch')}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                onClick={() => handleTabChange('watch')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
                   activeTab === 'watch'
-                    ? 'bg-amber-400 text-zinc-950 shadow-md shadow-amber-400/20'
+                    ? 'bg-amber-400 text-zinc-950 shadow-md shadow-amber-500/20'
                     : 'text-zinc-400 hover:text-white'
                 }`}
               >
-                ⏱️ Chronos Watch Video
+                <span>Chronos Smartwatch</span>
+                <span className="text-[10px] opacity-75 font-mono">₹32,490</span>
               </button>
             </div>
 
-            {/* Video Controls & Sound Equalizer Simulation */}
+            {/* Live Equalizer Indicator & Sound Control (Pause button removed as requested) */}
             <div className="flex items-center gap-3">
-              {/* Equalizer animation */}
               <div className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-xl bg-zinc-900/80 border border-zinc-800 text-[10px] text-zinc-400 font-mono">
                 <span className="w-1 h-3 bg-amber-400 animate-pulse rounded-full" />
                 <span className="w-1 h-5 bg-amber-400 animate-pulse delay-75 rounded-full" />
                 <span className="w-1 h-2 bg-amber-400 animate-pulse delay-150 rounded-full" />
                 <span className="w-1 h-4 bg-amber-400 animate-pulse delay-100 rounded-full" />
-                <span className="ml-1 uppercase tracking-wider text-amber-300 font-semibold">Motion Reel</span>
+                <span className="ml-1 uppercase tracking-wider text-amber-300 font-semibold">Live Loop</span>
               </div>
 
-              <button
-                onClick={togglePlay}
-                className="p-2.5 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-700/80 text-zinc-300 hover:text-white transition-all shadow-md cursor-pointer"
-                title={isPlaying ? 'Pause Background Video' : 'Play Background Video'}
-              >
-                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-              </button>
-
+              {/* Sound Toggle */}
               <button
                 onClick={toggleMute}
-                className="p-2.5 rounded-xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-700/80 text-zinc-300 hover:text-white transition-all shadow-md cursor-pointer"
-                title={isMuted ? 'Unmute Sound' : 'Mute Sound'}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl backdrop-blur-md border transition-all shadow-md cursor-pointer text-xs font-semibold ${
+                  !isMuted
+                    ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
+                    : 'bg-zinc-900/90 hover:bg-zinc-800 border-zinc-700/80 text-zinc-300 hover:text-white'
+                }`}
+                title={isMuted ? 'Turn Sound ON' : 'Turn Sound OFF'}
               >
-                {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-amber-400" />}
+                {isMuted ? (
+                  <>
+                    <VolumeX className="w-4 h-4" />
+                    <span className="hidden md:inline">Muted</span>
+                  </>
+                ) : (
+                  <>
+                    <Volume2 className="w-4 h-4 text-amber-400 animate-pulse" />
+                    <span className="hidden md:inline text-amber-300 font-bold">Sound ON</span>
+                  </>
+                )}
               </button>
             </div>
 
@@ -180,80 +201,105 @@ export default function VideoProductSpotlight({ product, onQuickView }) {
                 {current.title}
               </h2>
 
-              <p className="text-sm sm:text-base text-zinc-300 font-light max-w-xl leading-relaxed">
+              <p className="text-sm sm:text-base text-zinc-300 font-light leading-relaxed max-w-xl">
                 {current.tagline}
               </p>
 
-              {/* Price & Savings Badge */}
-              <div className="pt-2 flex items-baseline gap-3">
-                <span className="text-3xl font-black text-amber-400 font-mono">
-                  ₹{current.price.toLocaleString('en-IN')}
-                </span>
-                <span className="text-sm text-zinc-500 line-through font-mono">
-                  ₹{current.originalPrice.toLocaleString('en-IN')}
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
-                  Save ₹{(current.originalPrice - current.price).toLocaleString('en-IN')}
-                </span>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="pt-4 flex flex-wrap items-center gap-3">
-                <button
-                  onClick={handleOrder}
-                  className="px-6 py-3.5 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-xl hover:shadow-amber-500/25 flex items-center gap-2 active:scale-95 cursor-pointer"
-                >
-                  <ShoppingBag className="w-4 h-4" />
-                  <span>Order Flagship Piece</span>
-                </button>
-
-                <button
-                  onClick={() => onQuickView && onQuickView(activeTab === 'headphones' ? 'prod_1' : 'prod_2')}
-                  className="px-5 py-3.5 bg-zinc-900/80 hover:bg-zinc-800 text-white font-semibold text-xs tracking-wider rounded-xl border border-zinc-700 transition-all flex items-center gap-2 cursor-pointer"
-                >
-                  <Eye className="w-4 h-4 text-zinc-400" />
-                  <span>View Full Specs</span>
-                </button>
+              {/* Engineering Feature Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3">
+                {current.features.map((feat, i) => {
+                  const Icon = feat.icon;
+                  return (
+                    <div
+                      key={i}
+                      className="p-3.5 rounded-2xl bg-zinc-900/70 backdrop-blur-md border border-zinc-800 hover:border-amber-400/40 transition-colors"
+                    >
+                      <Icon className="w-5 h-5 text-amber-400 mb-2" />
+                      <div className="text-xs font-bold text-white mb-1">{feat.title}</div>
+                      <div className="text-[11px] text-zinc-400 leading-snug">{feat.desc}</div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Right: Feature Highlights Cards */}
-            <div className="lg:col-span-5 space-y-3">
-              {current.features.map((f, i) => {
-                const Icon = f.icon;
-                return (
-                  <div
-                    key={i}
-                    className="p-4 rounded-2xl bg-zinc-900/70 backdrop-blur-md border border-zinc-800 hover:border-amber-400/40 transition-all duration-300 flex items-start gap-4 group"
-                  >
-                    <div className="p-2.5 rounded-xl bg-amber-400/10 text-amber-400 border border-amber-400/20 shrink-0 group-hover:scale-110 transition-transform">
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors">
-                        {f.title}
-                      </h4>
-                      <p className="text-xs text-zinc-400 mt-0.5 leading-relaxed">
-                        {f.desc}
-                      </p>
-                    </div>
+            {/* Right Column: Direct Price Card & Fast Action Buttons */}
+            <div className="lg:col-span-5 flex flex-col items-center lg:items-end justify-center">
+              <div className="w-full max-w-sm p-6 rounded-3xl bg-zinc-900/90 backdrop-blur-xl border border-amber-400/40 shadow-2xl shadow-black/60 text-center lg:text-left space-y-5">
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] uppercase tracking-widest text-zinc-400 font-semibold">
+                    Direct Price Exclusive
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
+                    In Stock • Ready to Ship
+                  </span>
+                </div>
+
+                <div>
+                  <div className="flex items-baseline gap-3 justify-center lg:justify-start">
+                    <span className="text-3xl sm:text-4xl font-serif font-extrabold text-amber-400">
+                      ₹{current.price.toLocaleString('en-IN')}
+                    </span>
+                    <span className="text-sm text-zinc-500 line-through">
+                      ₹{current.originalPrice.toLocaleString('en-IN')}
+                    </span>
                   </div>
-                );
-              })}
+                  <p className="text-[11px] text-zinc-400 mt-1">
+                    Includes GST + Free Express Insured Delivery Across India
+                  </p>
+                </div>
+
+                {/* Direct Action Buttons with Sound Integration */}
+                <div className="space-y-2.5 pt-2">
+                  {/* Direct Buy Now Button */}
+                  <button
+                    onClick={handleDirectBuy}
+                    className="w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-bold text-sm tracking-wide flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 hover:scale-102 active:scale-98 transition-all cursor-pointer"
+                  >
+                    <Zap className="w-4 h-4 fill-zinc-950" />
+                    <span>Direct Price Buy Now &rarr; ₹{current.price.toLocaleString('en-IN')}</span>
+                  </button>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    {/* Add to Cart */}
+                    <button
+                      onClick={handleAddToCart}
+                      className="py-2.5 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <ShoppingBag className="w-3.5 h-3.5" />
+                      <span>Add to Bag</span>
+                    </button>
+
+                    {/* Quick View Details */}
+                    <button
+                      onClick={() => {
+                        soundManager.playTap();
+                        if (onQuickView) onQuickView(current.productId);
+                      }}
+                      className="py-2.5 px-4 rounded-xl border border-zinc-700 hover:border-zinc-500 text-zinc-300 hover:text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>Full Specs</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-center lg:justify-start gap-4 text-[11px] text-zinc-400 pt-2 border-t border-zinc-800">
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>2-Yr Warranty</span>
+                  </span>
+                  <span>&bull;</span>
+                  <span className="flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Same Day Dispatch</span>
+                  </span>
+                </div>
+
+              </div>
             </div>
 
-          </div>
-
-          {/* Bottom Trust Indicators */}
-          <div className="pt-6 border-t border-zinc-800/80 flex flex-wrap items-center justify-between gap-4 text-xs text-zinc-400">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>Complimentary insured air courier across India</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              <span>30-day in-home auditory trial with full refund guarantee</span>
-            </div>
           </div>
 
         </div>

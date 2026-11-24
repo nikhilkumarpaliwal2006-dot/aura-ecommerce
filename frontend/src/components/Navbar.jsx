@@ -11,8 +11,11 @@ import {
   LogOut,
   Sparkles,
   ChevronDown,
-  X
+  X,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
+import { soundManager } from '../utils/audio';
 
 export default function Navbar({
   searchTerm,
@@ -27,6 +30,7 @@ export default function Navbar({
   const { cartCount, wishlist, setIsCartOpen } = useCart();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
   const menuRef = useRef(null);
 
   // Close user dropdown when clicking outside
@@ -143,10 +147,40 @@ export default function Navbar({
                 </button>
               )}
 
+              {/* Sound Effects Toggle Button */}
+              <button
+                onClick={() => {
+                  const state = soundManager.toggleSound();
+                  setSoundEnabled(state);
+                }}
+                className={`p-2 sm:px-3 sm:py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  soundEnabled
+                    ? 'bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 border border-amber-500/30'
+                    : 'bg-zinc-100 text-zinc-400 hover:text-zinc-600'
+                }`}
+                title={soundEnabled ? 'Mute Button Sounds' : 'Enable Button Sounds'}
+                aria-label="Toggle Sound Effects"
+              >
+                {soundEnabled ? (
+                  <>
+                    <Volume2 className="w-4 h-4 text-amber-500" />
+                    <span className="hidden lg:inline text-[11px] font-bold">Audio ON</span>
+                  </>
+                ) : (
+                  <>
+                    <VolumeX className="w-4 h-4 text-zinc-400" />
+                    <span className="hidden lg:inline text-[11px]">Audio OFF</span>
+                  </>
+                )}
+              </button>
+
               {/* Wishlist Button */}
               <button
-                onClick={onOpenWishlist}
-                className="relative p-2.5 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-full transition-colors"
+                onClick={() => {
+                  soundManager.playTap();
+                  onOpenWishlist();
+                }}
+                className="relative p-2.5 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 rounded-full transition-colors cursor-pointer"
                 title="Wishlist"
               >
                 <Heart className="w-5 h-5" />
@@ -277,8 +311,11 @@ export default function Navbar({
 
               {/* Shopping Bag Button */}
               <button
-                onClick={() => setIsCartOpen(true)}
-                className="flex items-center gap-2.5 px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-full transition-all shadow-md hover:shadow-lg active:scale-95"
+                onClick={() => {
+                  soundManager.playTap();
+                  setIsCartOpen(true);
+                }}
+                className="flex items-center gap-2.5 px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-full transition-all shadow-md hover:shadow-lg active:scale-95 cursor-pointer"
               >
                 <ShoppingBag className="w-4 h-4" />
                 <span className="text-xs font-bold">{cartCount}</span>

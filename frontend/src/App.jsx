@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { CartProvider } from './context/CartContext';
+import { CartProvider, useCart } from './context/CartContext';
 import { api } from './api/client';
+import { soundManager } from './utils/audio';
 
 // Components
 import Navbar from './components/Navbar';
@@ -24,6 +25,7 @@ import VideoProductSpotlight from './components/VideoProductSpotlight';
 
 function ShopContent() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { addToCart } = useCart();
   const [guestAllowed, setGuestAllowed] = useState(false);
   const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(false);
   const [welcomeUser, setWelcomeUser] = useState(null);
@@ -37,7 +39,8 @@ function ShopContent() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('featured');
   const [showFilters, setShowFilters] = useState(false);
-  const [priceRange, setPriceRange] = useState(60000);
+  const [priceRange, setPriceRange] = useState(100000);
+  const [activePriceBucket, setActivePriceBucket] = useState('All Budgets');
   const [inStockOnly, setInStockOnly] = useState(false);
   const [minRating, setMinRating] = useState(0);
 
@@ -58,7 +61,7 @@ function ShopContent() {
         search: searchTerm,
         category: selectedCategory,
         sort: sortBy,
-        maxPrice: priceRange < 60000 ? priceRange : undefined,
+        maxPrice: priceRange < 100000 ? priceRange : undefined,
         inStockOnly: inStockOnly ? 'true' : undefined,
         minRating: minRating > 0 ? minRating : undefined
       };
@@ -86,9 +89,35 @@ function ShopContent() {
     setSearchTerm('');
     setSelectedCategory('All');
     setSortBy('featured');
-    setPriceRange(60000);
+    setPriceRange(100000);
+    setActivePriceBucket('All Budgets');
     setInStockOnly(false);
     setMinRating(0);
+  };
+
+  const handlePriceBucketSelect = (bucket) => {
+    setActivePriceBucket(bucket.label);
+    if (bucket.label === 'All Budgets') {
+      setPriceRange(100000);
+    } else {
+      setPriceRange(bucket.max);
+    }
+    scrollToCatalog();
+  };
+
+  const handleDirectBuy = (productIdOrObj, options = {}) => {
+    let target = null;
+    if (typeof productIdOrObj === 'string') {
+      target = products.find(p => p.id === productIdOrObj);
+    } else if (productIdOrObj && typeof productIdOrObj === 'object') {
+      target = productIdOrObj;
+    }
+
+    if (target) {
+      soundManager.playDirectBuy();
+      addToCart(target, options.quantity || 1, options);
+      setCheckoutOpen(true);
+    }
   };
 
   const scrollToCatalog = () => {
@@ -156,18 +185,19 @@ function ShopContent() {
         products={products}
       />
 
-      {/* Hero Showcase Slider with Video Background */}
+      {/* Hero Showcase Slider with Continuous Video Background & Active Direct Buy */}
       <HeroSlider
         onExploreClick={scrollToCatalog}
         onQuickView={(id) => {
           const p = products.find(x => x.id === id);
           if (p) setQuickViewProduct(p);
         }}
+        onDirectBuy={handleDirectBuy}
       />
 
       {/* Catalog Anchor */}
       <div ref={catalogRef}>
-        {/* Category & Quick Filter Navigation */}
+        {/* Category & Quick Filter Navigation with Direct Price Buttons */}
         <CategoryBar
           categories={categories}
           selectedCategory={selectedCategory}
@@ -177,6 +207,8 @@ function ShopContent() {
           showFilters={showFilters}
           onToggleFilters={() => setShowFilters(!showFilters)}
           totalCount={products.length}
+          activePriceBucket={activePriceBucket}
+          onSelectPriceBucket={handlePriceBucketSelect}
         />
 
         {/* Faceted Filter Drawer */}
@@ -198,6 +230,7 @@ function ShopContent() {
             products={products}
             loading={loading}
             onQuickView={(p) => setQuickViewProduct(p)}
+            onDirectBuy={handleDirectBuy}
             onResetFilters={handleResetFilters}
           />
         </main>
@@ -210,6 +243,7 @@ function ShopContent() {
           const p = products.find(x => x.id === id);
           if (p) setQuickViewProduct(p);
         }}
+        onDirectBuy={handleDirectBuy}
       />
 
       {/* Footer */}
@@ -231,6 +265,7 @@ function ShopContent() {
           product={quickViewProduct}
           onClose={() => setQuickViewProduct(null)}
           onProductUpdated={loadProducts}
+          onDirectBuy={handleDirectBuy}
         />
       )}
 

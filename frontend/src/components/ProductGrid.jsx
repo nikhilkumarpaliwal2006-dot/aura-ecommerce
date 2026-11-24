@@ -1,11 +1,13 @@
 import React from 'react';
 import ProductCard from './ProductCard';
 import { PackageSearch, RotateCcw } from 'lucide-react';
+import { soundManager } from '../utils/audio';
 
 export default function ProductGrid({
   products = [],
   loading = false,
   onQuickView,
+  onDirectBuy,
   onResetFilters
 }) {
   if (loading) {
@@ -39,8 +41,11 @@ export default function ProductGrid({
           We couldn't find any pieces matching your search or active filter criteria.
         </p>
         <button
-          onClick={onResetFilters}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-900 text-white text-xs font-bold rounded-full hover:bg-zinc-800 transition-all shadow-md"
+          onClick={() => {
+            soundManager.playTap();
+            if (onResetFilters) onResetFilters();
+          }}
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-900 text-white text-xs font-bold rounded-full hover:bg-zinc-800 transition-all shadow-md cursor-pointer"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           <span>Reset All Filters</span>
@@ -57,6 +62,7 @@ export default function ProductGrid({
             key={product.id}
             product={product}
             onQuickView={onQuickView}
+            onDirectBuy={onDirectBuy}
           />
         ))}
       </div>

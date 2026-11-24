@@ -7,13 +7,14 @@ import {
   Truck,
   RefreshCw,
   Award,
-  Play,
-  Pause,
   Volume2,
   VolumeX,
   Sparkles,
-  Radio
+  Radio,
+  Zap,
+  ShoppingBag
 } from 'lucide-react';
+import { soundManager } from '../utils/audio';
 
 const SLIDES = [
   {
@@ -24,7 +25,7 @@ const SLIDES = [
     video: '/videos/headphones.mp4',
     videoFallback: 'https://assets.mixkit.co/videos/5452/5452-720.mp4',
     image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1600&q=80',
-    highlight: '₹24,900',
+    highlight: '₹24,999',
     productId: 'prod_1',
     productName: 'NIKK AURA Studio Wireless Headphones',
     rating: '4.9 ★ (128 reviews)'
@@ -37,7 +38,7 @@ const SLIDES = [
     video: '/videos/watch.mp4',
     videoFallback: 'https://assets.mixkit.co/videos/9104/9104-720.mp4',
     image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1600&q=80',
-    highlight: '₹32,500',
+    highlight: '₹32,490',
     productId: 'prod_2',
     productName: 'Chronos Titanium Minimalist Smartwatch',
     rating: '4.8 ★ (94 reviews)'
@@ -57,9 +58,8 @@ const SLIDES = [
   }
 ];
 
-export default function HeroSlider({ onExploreClick, onQuickView }) {
+export default function HeroSlider({ onExploreClick, onQuickView, onDirectBuy }) {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const videoRef = useRef(null);
@@ -74,39 +74,52 @@ export default function HeroSlider({ onExploreClick, onQuickView }) {
     return () => clearInterval(timer);
   }, []);
 
-  // Update video playback when slide changes
+  // Update video playback continuously without pause
   useEffect(() => {
     setVideoLoaded(false);
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
-      videoRef.current.play().catch(() => {
-        // Autoplay policy fallback
-        setIsPlaying(false);
-      });
+      videoRef.current.play().catch(() => {});
     }
   }, [currentSlide]);
 
-  const togglePlay = () => {
+  const toggleMute = () => {
     if (!videoRef.current) return;
-    if (isPlaying) {
-      videoRef.current.pause();
-      setIsPlaying(false);
+    const nextMuted = !isMuted;
+    videoRef.current.muted = nextMuted;
+    setIsMuted(nextMuted);
+
+    if (!nextMuted) {
+      soundManager.playAmbientTone();
     } else {
-      videoRef.current.play().catch(() => {});
-      setIsPlaying(true);
+      soundManager.playTap();
     }
   };
 
-  const toggleMute = () => {
-    if (!videoRef.current) return;
-    videoRef.current.muted = !isMuted;
-    setIsMuted(!isMuted);
+  const handleNextSlide = () => {
+    soundManager.playTap();
+    setCurrentSlide(prev => (prev + 1) % SLIDES.length);
+  };
+
+  const handlePrevSlide = () => {
+    soundManager.playTap();
+    setCurrentSlide(prev => (prev - 1 + SLIDES.length) % SLIDES.length);
+  };
+
+  const handleDirectBuyClick = (e, productId) => {
+    e.stopPropagation();
+    soundManager.playDirectBuy();
+    if (onDirectBuy) {
+      onDirectBuy(productId);
+    } else if (onQuickView) {
+      onQuickView(productId);
+    }
   };
 
   return (
     <div className="relative bg-zinc-950 text-white overflow-hidden select-none">
       
-      {/* Background Video Layer with Smooth Fade Animation */}
+      {/* Background Video Layer: Continuous Loop, No Pausing */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {slide.video ? (
           <video
@@ -144,30 +157,36 @@ export default function HeroSlider({ onExploreClick, onQuickView }) {
       {/* Main Container */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 min-h-[580px] flex flex-col justify-between">
         
-        {/* Top Floating Video Controls & Badge */}
+        {/* Top Floating Badge & Audio Controls */}
         <div className="flex items-center justify-between gap-4 mb-4">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900/80 backdrop-blur-md border border-amber-400/30 text-amber-300 text-xs font-bold uppercase tracking-widest shadow-lg shadow-black/40">
             <Radio className="w-3.5 h-3.5 text-rose-500 animate-pulse" />
-            <span>CINEMATIC PRODUCT REEL</span>
+            <span>CONTINUOUS CINEMATIC MOTION</span>
           </div>
 
-          {/* Video Control Buttons */}
+          {/* Sound Control Button (Pause button removed as requested) */}
           <div className="flex items-center gap-2">
             <button
-              onClick={togglePlay}
-              className="p-2 rounded-full bg-zinc-900/70 hover:bg-zinc-800 backdrop-blur-md border border-zinc-700/60 text-zinc-300 hover:text-white transition-all shadow-md"
-              title={isPlaying ? 'Pause video' : 'Play video'}
-              aria-label="Toggle video playback"
-            >
-              {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-            </button>
-            <button
               onClick={toggleMute}
-              className="p-2 rounded-full bg-zinc-900/70 hover:bg-zinc-800 backdrop-blur-md border border-zinc-700/60 text-zinc-300 hover:text-white transition-all shadow-md"
-              title={isMuted ? 'Unmute audio' : 'Mute audio'}
-              aria-label="Toggle mute"
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-md border transition-all shadow-md cursor-pointer text-xs font-semibold ${
+                !isMuted 
+                  ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.3)]' 
+                  : 'bg-zinc-900/70 hover:bg-zinc-800 border-zinc-700/60 text-zinc-300 hover:text-white'
+              }`}
+              title={isMuted ? 'Turn Sound ON' : 'Turn Sound OFF'}
+              aria-label="Toggle sound"
             >
-              {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5 text-amber-400" />}
+              {isMuted ? (
+                <>
+                  <VolumeX className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Sound OFF</span>
+                </>
+              ) : (
+                <>
+                  <Volume2 className="w-3.5 h-3.5 text-amber-400 animate-bounce" />
+                  <span className="hidden sm:inline text-amber-400 font-bold">Sound ON</span>
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -175,7 +194,7 @@ export default function HeroSlider({ onExploreClick, onQuickView }) {
         {/* Content Section with Interactive Floating Card */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center my-auto">
           
-          {/* Left Column: Heading and Description */}
+          {/* Left Column: Heading, Subtitle & Direct Price Buttons */}
           <div className="lg:col-span-8">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-amber-300 text-[11px] font-bold uppercase tracking-widest mb-4">
               <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
@@ -190,26 +209,44 @@ export default function HeroSlider({ onExploreClick, onQuickView }) {
               {slide.subtitle}
             </p>
 
-            {/* CTAs */}
+            {/* CTAs with Direct Price Active Button */}
             <div className="flex flex-wrap items-center gap-4">
               <button
-                onClick={onExploreClick}
+                onClick={() => {
+                  soundManager.playTap();
+                  if (onExploreClick) onExploreClick();
+                }}
                 className="px-7 py-3.5 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-bold text-sm rounded-full transition-all flex items-center gap-2 shadow-xl hover:shadow-amber-500/20 hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <span>{slide.cta}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
               
-              <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900/60 backdrop-blur-md border border-zinc-800 rounded-full text-zinc-400 text-xs">
-                <span>Direct Price</span>
-                <strong className="text-amber-300 text-base font-semibold">{slide.highlight}</strong>
-              </div>
+              {/* Fully Active Direct Price Instant Buy Button */}
+              <button
+                onClick={(e) => handleDirectBuyClick(e, slide.productId)}
+                className="group flex items-center gap-2.5 px-5 py-3.5 bg-zinc-900/90 hover:bg-zinc-800 text-white rounded-full border border-amber-400/60 hover:border-amber-400 shadow-xl shadow-amber-500/10 hover:shadow-amber-500/30 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                title={`Instant Direct Checkout at ${slide.highlight}`}
+              >
+                <div className="w-6 h-6 rounded-full bg-amber-400/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+                  <Zap className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                </div>
+                <span className="text-xs uppercase tracking-wider text-zinc-300 font-semibold">Direct Price:</span>
+                <strong className="text-amber-400 text-base font-extrabold tracking-tight">{slide.highlight}</strong>
+                <span className="text-[11px] font-bold text-zinc-400 group-hover:text-amber-300 transition-colors ml-1">&rarr; Buy Now</span>
+              </button>
             </div>
           </div>
 
-          {/* Right Column: Floating Animated Product Spotlight Card */}
+          {/* Right Column: Floating Animated Product Spotlight Card with Direct Order */}
           <div className="lg:col-span-4 hidden lg:flex justify-end">
-            <div className="relative group cursor-pointer" onClick={() => onQuickView && onQuickView(slide.productId)}>
+            <div 
+              className="relative group cursor-pointer" 
+              onClick={() => {
+                soundManager.playTap();
+                if (onQuickView) onQuickView(slide.productId);
+              }}
+            >
               {/* Outer Glowing Border */}
               <div className="absolute -inset-1 bg-gradient-to-r from-amber-500/40 via-amber-300/30 to-amber-600/40 rounded-3xl blur-md opacity-75 group-hover:opacity-100 transition-opacity animate-pulse duration-1000" />
               
@@ -220,7 +257,7 @@ export default function HeroSlider({ onExploreClick, onQuickView }) {
                     <Sparkles className="w-3 h-3 text-amber-400" />
                     <span>In-Motion Preview</span>
                   </span>
-                  <span className="text-emerald-400">● Live</span>
+                  <span className="text-emerald-400">● Live Reel</span>
                 </div>
 
                 {/* Mini Image thumbnail */}
@@ -237,30 +274,39 @@ export default function HeroSlider({ onExploreClick, onQuickView }) {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-xs pt-1">
+                <div className="flex items-center justify-between text-xs pt-1 mb-3">
                   <span className="text-zinc-400 font-medium">{slide.rating}</span>
-                  <span className="text-sm font-extrabold text-amber-300 font-mono">{slide.highlight}</span>
+                  <span className="font-extrabold text-amber-400 text-sm">{slide.highlight}</span>
                 </div>
 
-                <div className="mt-3 pt-2.5 border-t border-zinc-800 flex items-center justify-between text-[11px] text-zinc-400 group-hover:text-amber-300 transition-colors">
-                  <span>Click for Specifications</span>
-                  <span>&rarr;</span>
-                </div>
+                {/* Direct Action inside Floating Card */}
+                <button
+                  onClick={(e) => handleDirectBuyClick(e, slide.productId)}
+                  className="w-full py-2 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-md hover:scale-102 active:scale-98 transition-all cursor-pointer"
+                >
+                  <Zap className="w-3 h-3 fill-zinc-950" />
+                  <span>Direct Buy Now</span>
+                </button>
               </div>
             </div>
           </div>
 
         </div>
 
-        {/* Carousel Indicators and Controls */}
-        <div className="flex items-center justify-between pt-8 border-t border-white/10 mt-8">
+        {/* Bottom Pagination & Navigation Dots */}
+        <div className="flex items-center justify-between pt-8 border-t border-white/10 mt-6">
           <div className="flex items-center gap-2">
             {SLIDES.map((_, idx) => (
               <button
                 key={idx}
-                onClick={() => setCurrentSlide(idx)}
-                className={`h-1.5 rounded-full transition-all cursor-pointer ${
-                  idx === currentSlide ? 'w-8 bg-amber-400' : 'w-2 bg-white/30 hover:bg-white/50'
+                onClick={() => {
+                  soundManager.playTap();
+                  setCurrentSlide(idx);
+                }}
+                className={`transition-all duration-300 rounded-full cursor-pointer ${
+                  currentSlide === idx
+                    ? 'w-8 h-2 bg-gradient-to-r from-amber-400 to-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.5)]'
+                    : 'w-2 h-2 bg-white/30 hover:bg-white/60'
                 }`}
                 aria-label={`Go to slide ${idx + 1}`}
               />
@@ -269,14 +315,14 @@ export default function HeroSlider({ onExploreClick, onQuickView }) {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setCurrentSlide(prev => (prev - 1 + SLIDES.length) % SLIDES.length)}
+              onClick={handlePrevSlide}
               className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
               aria-label="Previous slide"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
-              onClick={() => setCurrentSlide(prev => (prev + 1) % SLIDES.length)}
+              onClick={handleNextSlide}
               className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
               aria-label="Next slide"
             >
