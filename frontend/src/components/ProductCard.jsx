@@ -3,7 +3,7 @@ import { useCart } from '../context/CartContext';
 import { Star, Heart, Eye, Plus, Check, Zap, Sparkles } from 'lucide-react';
 import { soundManager } from '../utils/audio';
 
-export default function ProductCard({ product, onQuickView, onDirectBuy }) {
+export default function ProductCard({ product, onQuickView, onDirectBuy, isHighlighted = false }) {
   const { addToCart, toggleWishlist, isWishlisted, cart } = useCart();
   const wishlisted = isWishlisted(product.id);
   const isInCart = cart.some(item => item.productId === product.id);
@@ -45,8 +45,23 @@ export default function ProductCard({ product, onQuickView, onDirectBuy }) {
   };
 
   return (
-    <div className="group bg-white rounded-2xl border border-zinc-200/80 hover:border-zinc-300 hover:shadow-2xl transition-all duration-300 flex flex-col overflow-hidden relative">
+    <div 
+      id={`product-card-${product.id}`}
+      className={`group bg-white rounded-2xl border transition-all duration-500 flex flex-col overflow-hidden relative ${
+        isHighlighted
+          ? 'ring-4 ring-amber-400 border-amber-400 shadow-[0_0_45px_rgba(245,158,11,0.6)] scale-[1.03] z-20 animate-pulse'
+          : 'border-zinc-200/80 hover:border-zinc-300 hover:shadow-2xl'
+      }`}
+    >
       
+      {/* Search match focus banner if highlighted */}
+      {isHighlighted && (
+        <div className="absolute top-2.5 right-2.5 z-30 bg-amber-400 text-zinc-950 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-lg flex items-center gap-1">
+          <Sparkles className="w-3 h-3 fill-zinc-950" />
+          <span>Found Item</span>
+        </div>
+      )}
+
       {/* Product Image Container */}
       <div 
         onClick={handleQuickView}

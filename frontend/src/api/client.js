@@ -58,11 +58,13 @@ export const api = {
       });
     } catch (err) {
       console.warn('Backend sleeping or offline, applying instant local fallback login');
-      const isAdmin = email.toLowerCase().includes('admin');
+      const safeEmail = typeof email === 'string' ? email.trim() : '';
+      const isAdmin = safeEmail.toLowerCase().includes('admin');
+      const fallbackName = safeEmail.includes('@') ? (safeEmail.split('@')[0] || 'Aura Guest') : 'Aura Guest';
       const mockUser = {
         id: isAdmin ? 'usr_admin_1' : 'usr_demo_1',
-        name: isAdmin ? 'Nikhil Paliwal' : (email.split('@')[0] || 'Aura Guest'),
-        email: email,
+        name: isAdmin ? 'Nikhil Paliwal' : fallbackName,
+        email: safeEmail || (isAdmin ? 'admin@aura.com' : 'demo@aura.com'),
         role: isAdmin ? 'admin' : 'customer'
       };
       setLocalMockUser(mockUser);
@@ -83,10 +85,14 @@ export const api = {
       });
     } catch (err) {
       console.warn('Backend sleeping or offline, applying instant local fallback register');
+      const safeEmail = typeof email === 'string' ? email.trim() : '';
+      const safeName = typeof name === 'string' && name.trim() 
+        ? name.trim() 
+        : (safeEmail.includes('@') ? (safeEmail.split('@')[0] || 'Valued Guest') : 'Valued Guest');
       const mockUser = {
         id: 'usr_' + Date.now(),
-        name: name || 'Valued Guest',
-        email: email,
+        name: safeName,
+        email: safeEmail || 'guest@aura.com',
         role: 'customer'
       };
       setLocalMockUser(mockUser);

@@ -9,9 +9,15 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const normalizeUser = (u) => {
-    if (!u) return null;
-    const name = u.name || (u.email ? u.email.split('@')[0] : 'Collector');
-    return { ...u, name };
+    if (!u || typeof u !== 'object') return null;
+    let safeName = 'Valued Collector';
+    if (typeof u.name === 'string' && u.name.trim()) {
+      safeName = u.name.trim();
+    } else if (typeof u.email === 'string' && u.email.includes('@')) {
+      safeName = u.email.split('@')[0] || 'Collector';
+    }
+    const safeEmail = typeof u.email === 'string' ? u.email : '';
+    return { ...u, name: safeName, email: safeEmail };
   };
 
   useEffect(() => {

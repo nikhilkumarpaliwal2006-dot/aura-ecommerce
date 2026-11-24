@@ -1,8 +1,11 @@
 // Luxury Web Audio API Sound Synthesizer for NIKK AURA
-// Requires zero external sound assets - 100% reliable across all modern browsers.
+// Continuous luxury ambient audio + tactile interactive UI sounds
 
 let audioCtx = null;
 let isSoundEnabled = true;
+let ambientNodes = [];
+let ambientGain = null;
+let isAmbientRunning = false;
 
 function getAudioContext() {
   if (typeof window === 'undefined') return null;
@@ -20,17 +23,116 @@ function getAudioContext() {
 
 export const soundManager = {
   isEnabled: () => isSoundEnabled,
-  
+  isAmbientActive: () => isAmbientRunning,
+
+  // Continuous luxury ambient sound loop (plays indefinitely until turned off)
+  startContinuousAmbient: () => {
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return false;
+
+      // Stop any existing loop first
+      soundManager.stopContinuousAmbient();
+
+      // Master ambient gain node
+      ambientGain = ctx.createGain();
+      ambientGain.gain.setValueAtTime(0.001, ctx.currentTime);
+      // Gentle fade in over 1.2s to a warm, non-intrusive volume
+      ambientGain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 1.2);
+      ambientGain.connect(ctx.destination);
+
+      // Warm luxury chord: C3 (130.81Hz), G3 (196.00Hz), C4 (261.63Hz), E4 (329.63Hz)
+      const frequencies = [130.81, 196.00, 261.63, 329.63];
+      ambientNodes = [];
+
+      frequencies.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const nodeGain = ctx.createGain();
+        
+        // Soft soothing sine waves with gentle detuning for lush stereo warmth
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        osc.detune.setValueAtTime((idx - 1.5) * 4, ctx.currentTime);
+
+        nodeGain.gain.setValueAtTime(0.25, ctx.currentTime);
+
+        // Slow subtle LFO for breathing movement
+        const lfo = ctx.createOscillator();
+        const lfoGain = ctx.createGain();
+        lfo.type = 'sine';
+        lfo.frequency.setValueAtTime(0.15 + idx * 0.05, ctx.currentTime); // ~6 second breath cycle
+        lfoGain.gain.setValueAtTime(0.08, ctx.currentTime);
+
+        lfo.connect(lfoGain);
+        lfoGain.connect(nodeGain.gain);
+
+        osc.connect(nodeGain);
+        nodeGain.connect(ambientGain);
+
+        osc.start();
+        lfo.start();
+
+        ambientNodes.push(osc, lfo);
+      });
+
+      isAmbientRunning = true;
+      return true;
+    } catch (e) {
+      console.warn('Continuous ambient audio init error:', e);
+      return false;
+    }
+  },
+
+  // Stop continuous ambient sound with smooth fade out
+  stopContinuousAmbient: () => {
+    try {
+      if (ambientGain && audioCtx) {
+        ambientGain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+      }
+      setTimeout(() => {
+        ambientNodes.forEach(node => {
+          try {
+            node.stop();
+            node.disconnect();
+          } catch (e) {}
+        });
+        ambientNodes = [];
+        ambientGain = null;
+        isAmbientRunning = false;
+      }, 450);
+    } catch (e) {
+      ambientNodes = [];
+      ambientGain = null;
+      isAmbientRunning = false;
+    }
+  },
+
+  // Toggle continuous ambient audio loop
+  toggleContinuousAmbient: () => {
+    if (isAmbientRunning) {
+      soundManager.stopContinuousAmbient();
+      return false;
+    } else {
+      return soundManager.startContinuousAmbient();
+    }
+  },
+
+  // Toggle UI sound effects
   toggleSound: () => {
     isSoundEnabled = !isSoundEnabled;
     if (isSoundEnabled) {
       soundManager.playChime();
+    } else {
+      soundManager.stopContinuousAmbient();
     }
     return isSoundEnabled;
   },
 
   setSoundEnabled: (enabled) => {
     isSoundEnabled = !!enabled;
+    if (!isSoundEnabled) {
+      soundManager.stopContinuousAmbient();
+    }
   },
 
   // Soft luxury tactile tap
@@ -45,7 +147,7 @@ export const soundManager = {
 
       osc.type = 'sine';
       osc.frequency.setValueAtTime(600, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.04);
+      osc.frequency.exponentialRampToValueAtTime(140, ctx.currentTime + 0.04);
 
       gain.gain.setValueAtTime(0.08, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
@@ -135,8 +237,8 @@ export const soundManager = {
       const gain = ctx.createGain();
 
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(880, now); // A5
-      osc.frequency.exponentialRampToValueAtTime(1760, now + 0.15); // A6
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.exponentialRampToValueAtTime(1760, now + 0.15);
 
       gain.gain.setValueAtTime(0.09, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
@@ -146,35 +248,6 @@ export const soundManager = {
 
       osc.start(now);
       osc.stop(now + 0.3);
-    } catch (e) {}
-  },
-
-  // Ambient luxury harmonic pulse when unmute is pressed
-  playAmbientTone: () => {
-    try {
-      const ctx = getAudioContext();
-      if (!ctx) return;
-
-      const now = ctx.currentTime;
-      const freqs = [220, 277.18, 329.63]; // A3 Major chord (warm soothing ambient pad)
-
-      freqs.forEach((freq) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now);
-
-        gain.gain.setValueAtTime(0.001, now);
-        gain.gain.linearRampToValueAtTime(0.04, now + 0.4);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
-
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-
-        osc.start(now);
-        osc.stop(now + 1.9);
-      });
     } catch (e) {}
   }
 };

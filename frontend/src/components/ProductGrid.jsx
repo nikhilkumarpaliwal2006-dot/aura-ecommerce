@@ -6,6 +6,7 @@ import { soundManager } from '../utils/audio';
 export default function ProductGrid({
   products = [],
   loading = false,
+  highlightedProductId = null,
   onQuickView,
   onDirectBuy,
   onResetFilters
@@ -61,6 +62,7 @@ export default function ProductGrid({
           <ProductCard
             key={product.id}
             product={product}
+            isHighlighted={highlightedProductId === product.id}
             onQuickView={onQuickView}
             onDirectBuy={onDirectBuy}
           />

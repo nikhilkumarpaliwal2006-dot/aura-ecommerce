@@ -22,11 +22,16 @@ import Footer from './components/Footer';
 import GatewayAuth from './components/GatewayAuth';
 import PostLoginAnimation from './components/PostLoginAnimation';
 import VideoProductSpotlight from './components/VideoProductSpotlight';
+import DirectPurchaseModal from './components/DirectPurchaseModal';
 
 function ShopContent() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const { addToCart } = useCart();
-  const [guestAllowed, setGuestAllowed] = useState(false);
+  const [guestAllowed, setGuestAllowed] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return new URLSearchParams(window.location.search).get('guest') === 'true' ||
+           localStorage.getItem('aura_guest_allowed') === 'true';
+  });
   const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(false);
   const [welcomeUser, setWelcomeUser] = useState(null);
 
@@ -44,8 +49,11 @@ function ShopContent() {
   const [inStockOnly, setInStockOnly] = useState(false);
   const [minRating, setMinRating] = useState(0);
 
-  // Modals
+  // Modals & Direct Purchase
   const [quickViewProduct, setQuickViewProduct] = useState(null);
+  const [directBuyProduct, setDirectBuyProduct] = useState(null);
+  const [directBuyOptions, setDirectBuyOptions] = useState({});
+  const [highlightedProductId, setHighlightedProductId] = useState(null);
   const [authOpen, setAuthOpen] = useState(false);
   const [wishlistOpen, setWishlistOpen] = useState(false);
   const [ordersOpen, setOrdersOpen] = useState(false);
@@ -115,9 +123,32 @@ function ShopContent() {
 
     if (target) {
       soundManager.playDirectBuy();
-      addToCart(target, options.quantity || 1, options);
-      setCheckoutOpen(true);
+      setDirectBuyProduct(target);
+      setDirectBuyOptions(options);
     }
+  };
+
+  const handleLocateProduct = (productId) => {
+    soundManager.playTap();
+    const target = products.find(p => p.id === productId);
+    if (target && selectedCategory !== 'All' && target.category !== selectedCategory) {
+      setSelectedCategory('All');
+    }
+
+    setHighlightedProductId(productId);
+
+    setTimeout(() => {
+      const el = document.getElementById(`product-card-${productId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else if (catalogRef.current) {
+        catalogRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 120);
+
+    setTimeout(() => {
+      setHighlightedProductId(curr => (curr === productId ? null : curr));
+    }, 4500);
   };
 
   const scrollToCatalog = () => {
@@ -148,7 +179,12 @@ function ShopContent() {
         <Toast />
         <GatewayAuth
           onLoginSuccess={handleLoginSuccess}
-          onContinueGuest={() => setGuestAllowed(true)}
+          onContinueGuest={() => {
+            try {
+              localStorage.setItem('aura_guest_allowed', 'true');
+            } catch (e) {}
+            setGuestAllowed(true);
+          }}
         />
         {showWelcomeAnimation && (
           <PostLoginAnimation
@@ -182,6 +218,7 @@ function ShopContent() {
         onOpenWishlist={() => setWishlistOpen(true)}
         onOpenOrders={() => setOrdersOpen(true)}
         onOpenAdmin={() => setAdminOpen(true)}
+        onLocateProduct={handleLocateProduct}
         products={products}
       />
 
@@ -229,6 +266,7 @@ function ShopContent() {
           <ProductGrid
             products={products}
             loading={loading}
+            highlightedProductId={highlightedProductId}
             onQuickView={(p) => setQuickViewProduct(p)}
             onDirectBuy={handleDirectBuy}
             onResetFilters={handleResetFilters}
@@ -259,6 +297,17 @@ function ShopContent() {
       <CartDrawer
         onProceedToCheckout={() => setCheckoutOpen(true)}
       />
+
+      {/* Dedicated Direct Express Purchase Modal */}
+      {directBuyProduct && (
+        <DirectPurchaseModal
+          isOpen={!!directBuyProduct}
+          product={directBuyProduct}
+          options={directBuyOptions}
+          onClose={() => setDirectBuyProduct(null)}
+          onOrderPlaced={() => loadProducts()}
+        />
+      )}
 
       {quickViewProduct && (
         <ProductModal

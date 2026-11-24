@@ -435,11 +435,11 @@ export const SEED_PRODUCTS = [
     stockQuantity: 35,
     featured: false,
     badge: 'Monolith Tech',
-    image: 'https://images.unsplash.com/photo-1615526675159-e248c3021d3f?auto=format&fit=crop&w=800&q=80',
+    image: '/images/charger.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1615526675159-e248c3021d3f?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1615526675250-dbe5d4302ae0?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1615526674998-2ea0930bfe24?auto=format&fit=crop&w=800&q=80'
+      '/images/charger.jpg',
+      '/images/charger-stand.jpg',
+      '/images/charger-dock.jpg'
     ],
     shortDescription: 'Solid machined monolithic aluminum magnetic fast charger for phone, smartwatch, and earbuds.',
     description: 'Tidy up your workspace with architectural precision. Machined from a single solid block of aerospace aluminum monolith with weighted anti-slip silicone base. Strong N52 neodymium magnets align devices instantly with 15W Qi2 fast charging.',

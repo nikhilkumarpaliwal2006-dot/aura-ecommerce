@@ -24,13 +24,14 @@ export default function Navbar({
   onOpenWishlist,
   onOpenOrders,
   onOpenAdmin,
+  onLocateProduct,
   products = []
 }) {
   const { user, isAuthenticated, isAdmin, logout, quickDemoLogin } = useAuth();
   const { cartCount, wishlist, setIsCartOpen } = useCart();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(() => soundManager.isAmbientActive());
   const menuRef = useRef(null);
 
   // Close user dropdown when clicking outside
@@ -50,6 +51,28 @@ export default function Navbar({
         .filter(p => p.title.toLowerCase().includes(searchTerm.toLowerCase()) || p.category.toLowerCase().includes(searchTerm.toLowerCase()))
         .slice(0, 4)
     : [];
+
+  const handleLocateItem = (productId) => {
+    soundManager.playTap();
+    setSearchFocused(false);
+    if (onLocateProduct) {
+      onLocateProduct(productId);
+    }
+  };
+
+  const handleSearchSubmit = () => {
+    soundManager.playTap();
+    if (!searchTerm.trim()) return;
+    const query = searchTerm.trim().toLowerCase();
+    const match = products.find(p => 
+      p.title.toLowerCase().includes(query) || 
+      p.category.toLowerCase().includes(query)
+    );
+    if (match && onLocateProduct) {
+      onLocateProduct(match.id);
+      setSearchFocused(false);
+    }
+  };
 
   return (
     <>
@@ -87,18 +110,28 @@ export default function Navbar({
               </a>
             </div>
 
-            {/* Interactive Search Bar */}
+            {/* Interactive Search Bar with Direct Product Locator */}
             <div className="flex-1 max-w-xl mx-4 relative hidden md:block">
-              <div className="relative">
-                <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <div className="relative flex items-center">
+                <button
+                  type="button"
+                  onClick={handleSearchSubmit}
+                  title="Click search icon to locate product on page"
+                  className="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-amber-500 hover:bg-amber-50 rounded-full transition-all absolute left-2 top-1/2 -translate-y-1/2 cursor-pointer z-10"
+                >
+                  <Search className="w-4 h-4" />
+                </button>
                 <input
                   type="text"
-                  placeholder="Search audio, watches, cashmere, accessories..."
+                  placeholder="Search audio, watches, cashmere, charger..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onFocus={() => setSearchFocused(true)}
-                  onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
-                  className="w-full bg-zinc-100 hover:bg-zinc-100/80 focus:bg-white text-zinc-900 text-sm pl-10 pr-10 py-2.5 rounded-full border border-transparent focus:border-zinc-300 focus:outline-none focus:ring-4 focus:ring-zinc-900/5 transition-all"
+                  onBlur={() => setTimeout(() => setSearchFocused(false), 250)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSearchSubmit();
+                  }}
+                  className="w-full bg-zinc-100 hover:bg-zinc-100/80 focus:bg-white text-zinc-900 text-sm pl-11 pr-10 py-2.5 rounded-full border border-transparent focus:border-amber-300 focus:outline-none focus:ring-4 focus:ring-amber-500/10 transition-all"
                 />
                 {searchTerm && (
                   <button
@@ -110,23 +143,35 @@ export default function Navbar({
                 )}
               </div>
 
-              {/* Instant Search Suggestions Dropdown */}
+              {/* Instant Search Suggestions Dropdown with Location Click */}
               {searchFocused && searchSuggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-zinc-100 py-2 z-50 overflow-hidden">
-                  <div className="px-4 py-1.5 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">
-                    Quick Suggestions
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-zinc-100 py-2 z-50 overflow-hidden animate-in fade-in slide-in-from-top-1">
+                  <div className="px-4 py-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex items-center justify-between">
+                    <span>Direct Location Results</span>
+                    <span className="text-amber-600 lowercase font-normal">click item to jump & highlight</span>
                   </div>
                   {searchSuggestions.map(product => (
                     <button
                       key={product.id}
-                      onClick={() => setSearchTerm(product.title)}
-                      className="w-full flex items-center gap-3 px-4 py-2 hover:bg-zinc-50 text-left transition-colors"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        setSearchTerm(product.title);
+                        handleLocateItem(product.id);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-amber-50/60 text-left transition-colors cursor-pointer group"
                     >
-                      <img src={product.image} alt={product.title} className="w-10 h-10 object-cover rounded-lg" />
+                      <img src={product.image} alt={product.title} className="w-10 h-10 object-cover rounded-lg border border-zinc-200 group-hover:border-amber-400 shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-semibold text-zinc-900 truncate">{product.title}</div>
-                        <div className="text-xs text-zinc-500">{product.category} · ₹{product.price.toLocaleString('en-IN')}</div>
+                        <div className="text-sm font-semibold text-zinc-900 truncate group-hover:text-amber-600">{product.title}</div>
+                        <div className="text-xs text-zinc-500 flex items-center gap-2">
+                          <span>{product.category}</span>
+                          <span>·</span>
+                          <span className="font-bold text-amber-600 font-mono">₹{product.price.toLocaleString('en-IN')}</span>
+                        </div>
                       </div>
+                      <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full shrink-0">
+                        Locate 📍
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -147,23 +192,29 @@ export default function Navbar({
                 </button>
               )}
 
-              {/* Sound Effects Toggle Button */}
+              {/* Sound Effects & Continuous Ambient Toggle Button */}
               <button
                 onClick={() => {
-                  const state = soundManager.toggleSound();
-                  setSoundEnabled(state);
+                  const active = soundManager.isAmbientActive();
+                  if (active) {
+                    soundManager.stopContinuousAmbient();
+                    setSoundEnabled(false);
+                  } else {
+                    soundManager.startContinuousAmbient();
+                    setSoundEnabled(true);
+                  }
                 }}
                 className={`p-2 sm:px-3 sm:py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                   soundEnabled
-                    ? 'bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 border border-amber-500/30'
+                    ? 'bg-amber-500/15 text-amber-700 hover:bg-amber-500/25 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.25)]'
                     : 'bg-zinc-100 text-zinc-400 hover:text-zinc-600'
                 }`}
-                title={soundEnabled ? 'Mute Button Sounds' : 'Enable Button Sounds'}
+                title={soundEnabled ? 'Continuous Luxury Audio Playing (Click to Stop)' : 'Turn Continuous Luxury Audio ON'}
                 aria-label="Toggle Sound Effects"
               >
                 {soundEnabled ? (
                   <>
-                    <Volume2 className="w-4 h-4 text-amber-500" />
+                    <Volume2 className="w-4 h-4 text-amber-500 animate-pulse" />
                     <span className="hidden lg:inline text-[11px] font-bold">Audio ON</span>
                   </>
                 ) : (
@@ -324,16 +375,26 @@ export default function Navbar({
             </div>
           </div>
 
-          {/* Mobile Search Input */}
+          {/* Mobile Search Input with Direct Product Locator */}
           <div className="pb-3 md:hidden">
-            <div className="relative">
-              <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <div className="relative flex items-center">
+              <button
+                type="button"
+                onClick={handleSearchSubmit}
+                title="Locate product"
+                className="w-7 h-7 flex items-center justify-center text-zinc-400 hover:text-amber-500 rounded-full transition-all absolute left-2 top-1/2 -translate-y-1/2 cursor-pointer z-10"
+              >
+                <Search className="w-4 h-4" />
+              </button>
               <input
                 type="text"
-                placeholder="Search products..."
+                placeholder="Search products & tap icon to locate..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-zinc-100 text-zinc-900 text-sm pl-9 pr-8 py-2 rounded-full border border-transparent focus:outline-none focus:bg-white focus:border-zinc-300"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSearchSubmit();
+                }}
+                className="w-full bg-zinc-100 text-zinc-900 text-sm pl-10 pr-8 py-2 rounded-full border border-transparent focus:outline-none focus:bg-white focus:border-amber-300"
               />
               {searchTerm && (
                 <button

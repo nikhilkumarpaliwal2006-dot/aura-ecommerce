@@ -54,15 +54,15 @@ export default function VideoProductSpotlight({ product, onQuickView, onDirectBu
   const current = videoData[activeTab];
 
   const toggleMute = () => {
-    if (!videoRef.current) return;
-    const nextMuted = !isMuted;
-    videoRef.current.muted = nextMuted;
-    setIsMuted(nextMuted);
-
-    if (!nextMuted) {
-      soundManager.playAmbientTone();
+    const active = soundManager.isAmbientActive();
+    if (active) {
+      soundManager.stopContinuousAmbient();
+      setIsMuted(true);
+      if (videoRef.current) videoRef.current.muted = true;
     } else {
-      soundManager.playTap();
+      soundManager.startContinuousAmbient();
+      setIsMuted(false);
+      if (videoRef.current) videoRef.current.muted = false;
     }
   };
 
