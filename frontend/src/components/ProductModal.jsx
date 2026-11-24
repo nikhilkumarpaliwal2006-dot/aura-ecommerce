@@ -33,7 +33,10 @@ export default function ProductModal({ product, onClose, onProductUpdated, onDir
   const [submittingReview, setSubmittingReview] = useState(false);
 
   const wishlisted = isWishlisted(product.id);
-  const images = product.gallery && product.gallery.length > 0 ? product.gallery : [product.image];
+  const isCharger = product.title?.toLowerCase().includes('charger') || product.id === 'prod_11';
+  const images = isCharger
+    ? ['/images/charger.jpg', '/images/charger-stand.jpg', '/images/charger-dock.jpg']
+    : (product.gallery && product.gallery.length > 0 ? product.gallery : [product.image]);
 
   const handleAdd = () => {
     soundManager.playAddToCart();

@@ -11,6 +11,14 @@ export default function ProductCard({ product, onQuickView, onDirectBuy, isHighl
     product.colors && product.colors.length > 0 ? product.colors[0] : null
   );
 
+  // Reliable image resolution: charger always uses crisp local photography
+  const [imgSrc, setImgSrc] = useState(() => {
+    if (product.title?.toLowerCase().includes('charger') || product.id === 'prod_11') {
+      return '/images/charger.jpg';
+    }
+    return product.image || '/images/charger.jpg';
+  });
+
   // Discount percentage if originalPrice exists
   const discountPercent = product.originalPrice && product.originalPrice > product.price
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -68,7 +76,12 @@ export default function ProductCard({ product, onQuickView, onDirectBuy, isHighl
         className="relative aspect-[4/3] bg-zinc-100 overflow-hidden cursor-pointer"
       >
         <img
-          src={product.image}
+          src={imgSrc}
+          onError={() => {
+            if (product.title?.toLowerCase().includes('charger')) {
+              setImgSrc('/images/charger.jpg');
+            }
+          }}
           alt={product.title}
           loading="lazy"
           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"

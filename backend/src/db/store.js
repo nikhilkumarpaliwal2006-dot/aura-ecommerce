@@ -835,6 +835,17 @@ class DataStore {
       this.mongoError = null;
       console.log('✅ Connected to MongoDB Atlas successfully!');
 
+      // Ensure Minimalist Monolith Wireless Charger has fresh photography in MongoDB Atlas
+      await Product.updateMany(
+        { title: { $regex: /Wireless Charger|Monolith/i } },
+        { 
+          $set: { 
+            image: '/images/charger.jpg',
+            gallery: ['/images/charger.jpg', '/images/charger-stand.jpg', '/images/charger-dock.jpg'] 
+          } 
+        }
+      ).catch(() => {});
+
       // Auto-seed MongoDB Atlas if empty
       const productCount = await Product.countDocuments();
       if (productCount === 0) {
