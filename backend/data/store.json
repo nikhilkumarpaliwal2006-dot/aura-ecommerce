@@ -477,29 +477,32 @@
       "id": "prod_11",
       "title": "Minimalist Monolith Magnetic Wireless Charger",
       "category": "Electronics",
-      "price": 75,
-      "originalPrice": 90,
-      "rating": 4.6,
-      "reviewsCount": 82,
+      "price": 6200,
+      "originalPrice": 7500,
+      "rating": 4.8,
+      "reviewsCount": 96,
       "inStock": true,
       "stockQuantity": 35,
       "featured": false,
-      "badge": "Everyday Tech",
-      "image": "https://images.unsplash.com/photo-1622445262464-84b1456045b6?auto=format&fit=crop&w=800&q=80",
+      "badge": "Monolith Tech",
+      "image": "https://images.unsplash.com/photo-1615526675159-e248c3021d3f?auto=format&fit=crop&w=800&q=80",
       "gallery": [
-        "https://images.unsplash.com/photo-1622445262464-84b1456045b6?auto=format&fit=crop&w=800&q=80"
+        "https://images.unsplash.com/photo-1615526675159-e248c3021d3f?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1615526675250-dbe5d4302ae0?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1615526674998-2ea0930bfe24?auto=format&fit=crop&w=800&q=80"
       ],
-      "shortDescription": "Solid machined aluminum 3-in-1 fast charger for phone, smartwatch, and earbuds.",
-      "description": "Tidy up your workspace. Machined from a single block of aerospace aluminum with weighted anti-slip silicone base. Strong N52 neodymium magnets align devices instantly with 15W Qi2 fast charging.",
+      "shortDescription": "Solid machined monolithic aluminum magnetic fast charger for phone, smartwatch, and earbuds.",
+      "description": "Tidy up your workspace with architectural precision. Machined from a single solid block of aerospace aluminum monolith with weighted anti-slip silicone base. Strong N52 neodymium magnets align devices instantly with 15W Qi2 fast charging.",
       "features": [
+        "Solid machined aerospace aluminum monolith puck design",
         "Full 15W Qi2 certified magnetic fast charging",
-        "Simultaneous 3-device charging (Phone, Watch, Buds)",
-        "Heavyweight zinc alloy base stays planted during one-handed removal",
+        "Simultaneous multi-device charging (Phone, Watch, Buds)",
+        "Heavyweight anti-slip base stays planted during one-handed device removal",
         "Braided 2-meter USB-C power delivery cable included"
       ],
       "colors": [
-        "Space Gray",
-        "Silver Aluminum"
+        "Silver Aluminum Monolith",
+        "Space Gray Anodized"
       ],
       "createdAt": "2026-02-24T12:00:00Z",
       "reviews": [
