@@ -1,20 +1,53 @@
-# AURA | Modern Luxury E-Commerce Platform
+# NIKK AURA | Modern Luxury E-Commerce Platform
 
-A production-grade, full-stack e-commerce web platform engineered with a clean separated architecture:
-- **Backend**: Node.js, Express, RESTful APIs, JWT Auth, Bcrypt, and persistent atomic data layer.
-- **Frontend**: React 18, Vite, Tailwind CSS, Lucide Icons, and Canvas Confetti animations.
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-amber?style=for-the-badge&logo=vercel)](https://aura-ecommerce-eight-ashen.vercel.app/)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-black?style=for-the-badge&logo=github)](https://github.com/nikhilkumarpaliwal2006-dot/aura-ecommerce)
+
+> **Live Store**: [https://aura-ecommerce-eight-ashen.vercel.app/](https://aura-ecommerce-eight-ashen.vercel.app/)  
+> **GitHub Repository**: [https://github.com/nikhilkumarpaliwal2006-dot/aura-ecommerce](https://github.com/nikhilkumarpaliwal2006-dot/aura-ecommerce)
+
+A production-grade, full-stack luxury e-commerce web platform engineered with a clean separated architecture:
+- **Backend**: Node.js, Express, RESTful APIs, JWT Auth, Bcrypt, MongoDB Atlas / persistent atomic JSON store.
+- **Frontend**: React 18, Vite, Tailwind CSS, Lucide Icons, Canvas Confetti, and Web Audio API synthesis.
 
 ---
 
-## 🌟 Highlights & Key Features
+## 🌟 Latest Updates & New Features
 
-### 🛍️ Client Shopping Experience
-- **Luxury Visual Design**: Editorial photography, crisp typography (Plus Jakarta Sans), smooth micro-interactions.
-- **Hero Showcase Slider**: Auto-rotating hero with high-impact visuals, value propositions, and direct CTA.
-- **Real-Time Fuzzy Search**: Live auto-suggestions dropdown as you type.
-- **Faceted Catalog Filtering**: Category pills (Electronics, Fashion, Living, Accessories), price range slider, rating filters, and in-stock toggle.
-- **Product Experience**: Multi-image gallery with thumbnail selection, color & size variant selectors, inventory urgency indicator, specs list, and verified customer reviews.
-- **Interactive Review System**: Customers can submit verified ratings and comments that instantly update the product's average score.
+### 📦 Real-Time Order Tracking & Milestone Timeline
+- **Live Logistics Tracking Modal**: Visual tracking timeline matching professional logistics interfaces with status cards:
+  - 🟢 **Status Card**: `Order Shipped` / `Delivered` with live pulse radar indicator.
+  - 🔵 **Estimated Delivery Date Card**: Clear date calculation based on dispatch schedule.
+  - **Step-by-Step Vertical Milestones**:
+    1. **Placed**: Order received & verified in NIKK AURA vault.
+    2. **Processing**: White-glove inspection & tamper-proof luxury seal applied.
+    3. **In Transit**: Dispatched via Blue Dart Air Priority Express with live location tracking.
+    4. **Delivered**: Handover with contactless OTP verification.
+- **Multi-Order Switcher & AWB Copy**: Switch between orders (`ord_7824`, `ord_6219`) with 1-click AWB copying and printable receipts.
+- **Prominent Navigation Points**:
+  - Top header `📦 Track Orders [LIVE]` glowing button.
+  - Persistent bottom-left floating dock pill `TRACK ORDERS [LIVE 📍]`.
+  - Direct 1-click tracking access from the Post-Purchase Celebration Popup.
+
+### 🎨 Bidirectional Variant & Image Gallery Sync
+- **Interactive Color & Variety Switching**: Clicking any color variety (e.g. *Silver Titanium*, *Matte Obsidian*, *Champagne Gold*) dynamically syncs to the corresponding product image.
+- **Smooth Swiping Gallery Animation**: Smooth transition between gallery views with active indicators and arrow controls.
+- **Similar & Complementary Products**: Curated recommended pieces placed below the product image with 1-click Direct Buy and Add to Bag.
+
+### ⚡ Direct Buy & Audio Experience
+- **1-Click Express Direct Buy**: Instant purchase modal bypassing the cart for fastest checkout.
+- **Continuous Ambient & Sound Effects**: Toggleable high-fidelity sound synthesis and victory fanfare on order celebration.
+- **Minimalist Monolith Wireless Charger**: Dedicated high-resolution imagery and direct catalog navigation.
+
+---
+
+## 🛍️ Core Shopping Experience
+- **Luxury Visual Design**: Editorial photography, crisp typography (Plus Jakarta Sans & Playfair Display), smooth micro-interactions.
+- **Hero Showcase Slider**: Auto-rotating hero with continuous video showcase, high-impact visuals, and direct CTA.
+- **Real-Time Fuzzy Search & Direct Location**: Live auto-suggestions dropdown with direct scroll & highlight to the target product.
+- **Faceted Catalog Filtering**: Category pills (Electronics, Fashion, Living, Accessories), price range buckets, rating filters, and in-stock toggle.
+- **Interactive Review System**: Verified customer ratings, feedback submission, and real-time average calculation.
+- **Royal Celebration Popup**: Gold confetti fireworks, order confirmation, and seamless transition to live tracking.
 - **Slide-Over Cart Drawer**: Free shipping progress bar ($100 goal), quantity adjustments, promo coupons (`WELCOME10`, `AURA20`, `FLAT30`), item deletion, and live tax/shipping computation.
 - **3-Step Checkout Flow**:
   1. Shipping & Contact information form.
