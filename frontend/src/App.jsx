@@ -23,6 +23,7 @@ import GatewayAuth from './components/GatewayAuth';
 import PostLoginAnimation from './components/PostLoginAnimation';
 import VideoProductSpotlight from './components/VideoProductSpotlight';
 import DirectPurchaseModal from './components/DirectPurchaseModal';
+import CongratulationsModal from './components/CongratulationsModal';
 
 function ShopContent() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
@@ -53,6 +54,7 @@ function ShopContent() {
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [directBuyProduct, setDirectBuyProduct] = useState(null);
   const [directBuyOptions, setDirectBuyOptions] = useState({});
+  const [celebrationOrder, setCelebrationOrder] = useState(null);
   const [highlightedProductId, setHighlightedProductId] = useState(null);
   const [authOpen, setAuthOpen] = useState(false);
   const [wishlistOpen, setWishlistOpen] = useState(false);
@@ -159,6 +161,13 @@ function ShopContent() {
       setTimeout(() => {
         setHighlightedProductId(curr => (curr === target.id ? null : curr));
       }, 4500);
+    }
+  };
+
+  const handleOrderPlaced = (order) => {
+    loadProducts();
+    if (order) {
+      setCelebrationOrder(order);
     }
   };
 
@@ -316,7 +325,7 @@ function ShopContent() {
           product={directBuyProduct}
           options={directBuyOptions}
           onClose={() => setDirectBuyProduct(null)}
-          onOrderPlaced={() => loadProducts()}
+          onOrderPlaced={handleOrderPlaced}
         />
       )}
 
@@ -332,8 +341,21 @@ function ShopContent() {
       <CheckoutModal
         isOpen={checkoutOpen}
         onClose={() => setCheckoutOpen(false)}
-        onOrderPlaced={() => loadProducts()}
+        onOrderPlaced={handleOrderPlaced}
       />
+
+      {/* Royal Congratulations Celebration Popup */}
+      {celebrationOrder && (
+        <CongratulationsModal
+          isOpen={!!celebrationOrder}
+          order={celebrationOrder}
+          onClose={() => setCelebrationOrder(null)}
+          onViewDetails={() => {
+            setCelebrationOrder(null);
+            setOrdersOpen(true);
+          }}
+        />
+      )}
 
       <OrderHistoryModal
         isOpen={ordersOpen}

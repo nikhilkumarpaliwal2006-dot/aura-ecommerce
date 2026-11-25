@@ -96,9 +96,9 @@ export default function DirectPurchaseModal({ product, options = {}, isOpen, onC
 
       const res = await api.createOrder(orderData);
       if (res.success && res.order) {
-        soundManager.playDirectBuy();
+        soundManager.playCongratulationsSound();
         setOrderSuccess(res.order);
-        showToast('⚡ Direct Order Placed! Luxury dispatch dispatched.');
+        showToast('🎉 Congratulations! Direct Order Placed.');
         if (onOrderPlaced) onOrderPlaced(res.order);
       } else {
         throw new Error(res.message || 'Direct checkout could not be completed');

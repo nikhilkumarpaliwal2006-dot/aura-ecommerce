@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
+import { soundManager } from '../utils/audio';
 import confetti from 'canvas-confetti';
 import {
   X,
@@ -94,9 +95,10 @@ export default function CheckoutModal({ isOpen, onClose, onOrderPlaced }) {
       const res = await api.createOrder(payload);
 
       if (res.success) {
+        soundManager.playCongratulationsSound();
         setCompletedOrder(res.order);
         clearCart();
-        showToast('Order confirmed! Receipt generated.');
+        showToast('🎉 Congratulations! Order confirmed & payment verified.');
 
         // Trigger celebratory confetti
         confetti({

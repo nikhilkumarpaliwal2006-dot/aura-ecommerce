@@ -249,5 +249,60 @@ export const soundManager = {
       osc.start(now);
       osc.stop(now + 0.3);
     } catch (e) {}
+  },
+
+  // Grand, celebratory luxury fanfare for Order Success & Congratulations
+  playCongratulationsSound: () => {
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+
+      const now = ctx.currentTime;
+      // Triumphant ascending fanfare: C4, E4, G4, C5, E5, G5, C6 (Grand Royal Fanfare)
+      const fanfare = [
+        { freq: 261.63, delay: 0.00, dur: 0.28 },
+        { freq: 329.63, delay: 0.08, dur: 0.28 },
+        { freq: 392.00, delay: 0.16, dur: 0.32 },
+        { freq: 523.25, delay: 0.24, dur: 0.40 },
+        { freq: 659.25, delay: 0.36, dur: 0.48 },
+        { freq: 783.99, delay: 0.46, dur: 0.55 },
+        { freq: 1046.50, delay: 0.58, dur: 1.25 } // Grand sustained high bell
+      ];
+
+      fanfare.forEach(note => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        // Shimmering bell tone
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(note.freq, now + note.delay);
+
+        gain.gain.setValueAtTime(0.20, now + note.delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + note.delay + note.dur);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now + note.delay);
+        osc.stop(now + note.delay + note.dur);
+      });
+
+      // Warm celebration sustained harmony chord under the final bell
+      const harmonyChord = [261.63, 392.00, 523.25, 659.25];
+      harmonyChord.forEach(freq => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + 0.58);
+        gain.gain.setValueAtTime(0.09, now + 0.58);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.85);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + 0.58);
+        osc.stop(now + 1.86);
+      });
+    } catch (e) {
+      console.warn('Celebration sound error:', e);
+    }
   }
 };
