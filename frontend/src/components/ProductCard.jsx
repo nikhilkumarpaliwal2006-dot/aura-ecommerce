@@ -176,10 +176,13 @@ export default function ProductCard({ product, onQuickView, onDirectBuy, isHighl
                       e.stopPropagation();
                       soundManager.playTap();
                       setSelectedColor(col);
+                      if (Array.isArray(product.gallery) && product.gallery[idx]) {
+                        setImgSrc(product.gallery[idx]);
+                      }
                     }}
-                    className={`px-2 py-0.5 rounded-md text-[10px] font-semibold transition-all cursor-pointer ${
+                    className={`px-2 py-0.5 rounded-md text-[10px] font-semibold transition-all duration-300 cursor-pointer ${
                       selectedColor === col
-                        ? 'bg-zinc-900 text-white shadow-xs'
+                        ? 'bg-zinc-950 text-amber-400 shadow-xs ring-1 ring-amber-400/50'
                         : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-600'
                     }`}
                   >

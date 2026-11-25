@@ -14,7 +14,9 @@ import {
   RotateCcw,
   Sparkles,
   MessageSquarePlus,
-  Zap
+  Zap,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { soundManager } from '../utils/audio';
 
@@ -31,6 +33,7 @@ export default function ProductModal({
   const { addToCart, toggleWishlist, isWishlisted, showToast } = useCart();
   const { user } = useAuth();
   const modalScrollRef = useRef(null);
+  const touchStartX = useRef(null);
 
   const [product, setProduct] = useState(initialProduct);
 
@@ -42,7 +45,19 @@ export default function ProductModal({
     return item.image || (item.gallery && item.gallery[0]) || '/images/charger.jpg';
   };
 
-  const [activeImage, setActiveImage] = useState(() => resolveImage(initialProduct));
+  const getProductImages = (prod) => {
+    if (!prod) return ['/images/charger.jpg'];
+    if (prod.title?.toLowerCase().includes('charger') || prod.id === 'prod_11') {
+      return ['/images/charger.jpg', '/images/charger-stand.jpg', '/images/charger-dock.jpg'];
+    }
+    if (Array.isArray(prod.gallery) && prod.gallery.length > 0) {
+      return prod.gallery;
+    }
+    return [prod.image || '/images/charger.jpg'];
+  };
+
+  const [images, setImages] = useState(() => getProductImages(initialProduct));
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedColor, setSelectedColor] = useState((initialProduct.colors && initialProduct.colors[0]) || null);
   const [selectedSize, setSelectedSize] = useState((initialProduct.sizes && initialProduct.sizes[0]) || null);
   const [quantity, setQuantity] = useState(1);
@@ -55,18 +70,79 @@ export default function ProductModal({
   useEffect(() => {
     if (initialProduct) {
       setProduct(initialProduct);
-      setActiveImage(resolveImage(initialProduct));
+      const newImages = getProductImages(initialProduct);
+      setImages(newImages);
+      setActiveImageIndex(0);
       setSelectedColor((initialProduct.colors && initialProduct.colors[0]) || null);
       setSelectedSize((initialProduct.sizes && initialProduct.sizes[0]) || null);
       setQuantity(1);
     }
   }, [initialProduct]);
 
+  // Handlers for bidirectional sync between Color buttons and Gallery Images
+  const handleSelectColor = (color, colorIdx) => {
+    soundManager.playTap();
+    setSelectedColor(color);
+    if (images.length > 0) {
+      const targetIndex = colorIdx % images.length;
+      setActiveImageIndex(targetIndex);
+    }
+  };
+
+  const handleSelectThumbnail = (img, thumbIdx) => {
+    soundManager.playTap();
+    setActiveImageIndex(thumbIdx);
+    if (product.colors && product.colors.length > 0) {
+      const matchingColor = product.colors[thumbIdx % product.colors.length];
+      setSelectedColor(matchingColor);
+    }
+  };
+
+  const handlePrevImage = (e) => {
+    if (e) e.stopPropagation();
+    soundManager.playTap();
+    if (images.length <= 1) return;
+    const newIdx = (activeImageIndex - 1 + images.length) % images.length;
+    setActiveImageIndex(newIdx);
+    if (product.colors && product.colors.length > 0) {
+      setSelectedColor(product.colors[newIdx % product.colors.length]);
+    }
+  };
+
+  const handleNextImage = (e) => {
+    if (e) e.stopPropagation();
+    soundManager.playTap();
+    if (images.length <= 1) return;
+    const newIdx = (activeImageIndex + 1) % images.length;
+    setActiveImageIndex(newIdx);
+    if (product.colors && product.colors.length > 0) {
+      setSelectedColor(product.colors[newIdx % product.colors.length]);
+    }
+  };
+
+  // Touch swipe support on main image preview
+  const handleTouchStart = (e) => {
+    if (e.touches && e.touches[0]) {
+      touchStartX.current = e.touches[0].clientX;
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    if (e.changedTouches && e.changedTouches[0]) {
+      const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+      if (Math.abs(deltaX) > 40) {
+        if (deltaX > 0) {
+          handlePrevImage();
+        } else {
+          handleNextImage();
+        }
+      }
+    }
+    touchStartX.current = null;
+  };
+
   const wishlisted = isWishlisted(product.id || product._id);
-  const isCharger = product.title?.toLowerCase().includes('charger') || product.id === 'prod_11';
-  const images = isCharger
-    ? ['/images/charger.jpg', '/images/charger-stand.jpg', '/images/charger-dock.jpg']
-    : (product.gallery && product.gallery.length > 0 ? product.gallery : [resolveImage(product)]);
 
   // Compute curated similar products
   const productPool = (Array.isArray(allProducts) && allProducts.length > 0) ? allProducts : SEED_PRODUCTS;
@@ -87,7 +163,9 @@ export default function ProductModal({
   const handleSelectSimilarProduct = (item) => {
     soundManager.playTap();
     setProduct(item);
-    setActiveImage(resolveImage(item));
+    const itemImages = getProductImages(item);
+    setImages(itemImages);
+    setActiveImageIndex(0);
     setSelectedColor((item.colors && item.colors[0]) || null);
     setSelectedSize((item.sizes && item.sizes[0]) || null);
     setQuantity(1);
@@ -160,33 +238,112 @@ export default function ProductModal({
             
             {/* Gallery Column */}
             <div className="space-y-4">
-              <div className="aspect-[4/3] bg-zinc-100 rounded-2xl overflow-hidden relative border border-zinc-200">
-                <img
-                  src={activeImage}
-                  alt={product.title}
-                  className="w-full h-full object-cover object-center"
-                />
+              {/* Swiping Image Viewer */}
+              <div
+                className="aspect-[4/3] bg-zinc-100 rounded-2xl overflow-hidden relative border border-zinc-200 group select-none cursor-grab active:cursor-grabbing"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+              >
+                {/* Horizontal Swiping Strip */}
+                <div
+                  className="flex h-full w-full transition-transform duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]"
+                  style={{ transform: `translateX(-${activeImageIndex * 100}%)` }}
+                >
+                  {images.map((img, idx) => (
+                    <div key={idx} className="w-full h-full shrink-0 relative overflow-hidden bg-zinc-50 flex items-center justify-center">
+                      <img
+                        src={img}
+                        alt={`${product.title} - ${product.colors?.[idx] || idx + 1}`}
+                        className="w-full h-full object-cover object-center pointer-events-none transition-transform duration-700 hover:scale-105"
+                        onError={(e) => {
+                          if (product.title?.toLowerCase().includes('charger')) {
+                            e.currentTarget.src = '/images/charger.jpg';
+                          }
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Left / Right Chevron Controls */}
+                {images.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handlePrevImage}
+                      className="absolute left-2.5 top-1/2 -translate-y-1/2 p-2 rounded-full bg-zinc-950/65 hover:bg-zinc-950/90 text-white backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg border border-white/10 z-10 cursor-pointer"
+                      title="Previous variety"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleNextImage}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 rounded-full bg-zinc-950/65 hover:bg-zinc-950/90 text-white backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg border border-white/10 z-10 cursor-pointer"
+                      title="Next variety"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
+
+                {/* Active Variety Pill Tag */}
+                {selectedColor && (
+                  <div className="absolute bottom-3 left-3 z-10 px-3 py-1 bg-zinc-950/85 backdrop-blur-md border border-white/10 rounded-full text-[11px] font-semibold text-amber-300 flex items-center gap-1.5 shadow-lg pointer-events-none animate-in fade-in">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    <span className="tracking-wide">{selectedColor}</span>
+                  </div>
+                )}
+
+                {/* Badge */}
                 {product.badge && (
-                  <span className="absolute top-3 left-3 px-3 py-1 bg-zinc-900/90 text-white text-xs font-bold rounded-full backdrop-blur-md">
+                  <span className="absolute top-3 left-3 z-10 px-3 py-1 bg-zinc-900/90 text-white text-xs font-bold rounded-full backdrop-blur-md shadow-sm">
                     {product.badge}
                   </span>
                 )}
+
+                {/* Pagination Dots */}
+                {images.length > 1 && (
+                  <div className="absolute bottom-3 right-3 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/45 backdrop-blur-md">
+                    {images.map((_, i) => (
+                      <span
+                        key={i}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          activeImageIndex === i ? 'w-4 bg-amber-400' : 'w-1.5 bg-white/60'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {/* Thumbnails */}
+              {/* Thumbnails with Active Variety Sync */}
               {images.length > 1 && (
-                <div className="flex items-center gap-3 overflow-x-auto pb-1">
-                  {images.map((img, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveImage(img)}
-                      className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
-                        activeImage === img ? 'border-zinc-900 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
-                      }`}
-                    >
-                      <img src={img} alt="" className="w-full h-full object-cover" />
-                    </button>
-                  ))}
+                <div className="flex items-center gap-3 overflow-x-auto pb-1 scrollbar-none">
+                  {images.map((img, idx) => {
+                    const matchingColor = product.colors && product.colors[idx % product.colors.length];
+                    const isActive = activeImageIndex === idx;
+
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => handleSelectThumbnail(img, idx)}
+                        title={matchingColor ? `View ${matchingColor}` : `Variety ${idx + 1}`}
+                        className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition-all duration-300 cursor-pointer ${
+                          isActive
+                            ? 'border-amber-400 ring-2 ring-amber-400/40 shadow-lg scale-105'
+                            : 'border-transparent opacity-60 hover:opacity-100 hover:scale-102'
+                        }`}
+                      >
+                        <img src={img} alt="" className="w-full h-full object-cover" />
+                        {matchingColor && (
+                          <span className="absolute bottom-0 inset-x-0 bg-black/75 text-[8px] font-bold text-white text-center py-0.5 truncate px-0.5">
+                            {matchingColor.split(' ')[0]}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
 
@@ -376,26 +533,30 @@ export default function ProductModal({
                   {product.description || product.shortDescription}
                 </p>
 
-                {/* Color Variants */}
+                {/* Color Variants with Bidirectional Sync & Active Golden Indicator */}
                 {product.colors && product.colors.length > 0 && (
                   <div className="mb-5">
                     <label className="block text-xs font-bold text-zinc-700 uppercase tracking-wider mb-2">
-                      Finish: <span className="text-zinc-900 font-semibold">{selectedColor}</span>
+                      Finish: <span className="text-amber-600 font-bold ml-1">{selectedColor}</span>
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      {product.colors.map(color => (
-                        <button
-                          key={color}
-                          onClick={() => setSelectedColor(color)}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-all ${
-                            selectedColor === color
-                              ? 'border-zinc-900 bg-zinc-900 text-white shadow-sm'
-                              : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400'
-                          }`}
-                        >
-                          {color}
-                        </button>
-                      ))}
+                      {product.colors.map((color, idx) => {
+                        const isSelected = selectedColor === color;
+                        return (
+                          <button
+                            key={color}
+                            onClick={() => handleSelectColor(color, idx)}
+                            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
+                              isSelected
+                                ? 'border-amber-400 bg-zinc-950 text-amber-300 shadow-md shadow-amber-500/15 scale-102 ring-1 ring-amber-400/50'
+                                : 'border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400 hover:bg-zinc-50'
+                            }`}
+                          >
+                            {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>}
+                            <span>{color}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
