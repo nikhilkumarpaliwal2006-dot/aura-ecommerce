@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
+import { SEED_PRODUCTS } from '../data/seedData';
 import {
   X,
   Star,
@@ -17,26 +18,87 @@ import {
 } from 'lucide-react';
 import { soundManager } from '../utils/audio';
 
-export default function ProductModal({ product, onClose, onProductUpdated, onDirectBuy }) {
-  if (!product) return null;
+export default function ProductModal({
+  product: initialProduct,
+  allProducts = [],
+  onSelectProduct,
+  onClose,
+  onProductUpdated,
+  onDirectBuy
+}) {
+  if (!initialProduct) return null;
 
   const { addToCart, toggleWishlist, isWishlisted, showToast } = useCart();
   const { user } = useAuth();
+  const modalScrollRef = useRef(null);
 
-  const [activeImage, setActiveImage] = useState(product.image);
-  const [selectedColor, setSelectedColor] = useState((product.colors && product.colors[0]) || null);
-  const [selectedSize, setSelectedSize] = useState((product.sizes && product.sizes[0]) || null);
+  const [product, setProduct] = useState(initialProduct);
+
+  const resolveImage = (item) => {
+    if (!item) return '/images/charger.jpg';
+    if (item.title?.toLowerCase().includes('charger') || item.id === 'prod_11') {
+      return '/images/charger.jpg';
+    }
+    return item.image || (item.gallery && item.gallery[0]) || '/images/charger.jpg';
+  };
+
+  const [activeImage, setActiveImage] = useState(() => resolveImage(initialProduct));
+  const [selectedColor, setSelectedColor] = useState((initialProduct.colors && initialProduct.colors[0]) || null);
+  const [selectedSize, setSelectedSize] = useState((initialProduct.sizes && initialProduct.sizes[0]) || null);
   const [quantity, setQuantity] = useState(1);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [newRating, setNewRating] = useState(5);
   const [newComment, setNewComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
 
-  const wishlisted = isWishlisted(product.id);
+  // Sync state if initialProduct prop updates
+  useEffect(() => {
+    if (initialProduct) {
+      setProduct(initialProduct);
+      setActiveImage(resolveImage(initialProduct));
+      setSelectedColor((initialProduct.colors && initialProduct.colors[0]) || null);
+      setSelectedSize((initialProduct.sizes && initialProduct.sizes[0]) || null);
+      setQuantity(1);
+    }
+  }, [initialProduct]);
+
+  const wishlisted = isWishlisted(product.id || product._id);
   const isCharger = product.title?.toLowerCase().includes('charger') || product.id === 'prod_11';
   const images = isCharger
     ? ['/images/charger.jpg', '/images/charger-stand.jpg', '/images/charger-dock.jpg']
-    : (product.gallery && product.gallery.length > 0 ? product.gallery : [product.image]);
+    : (product.gallery && product.gallery.length > 0 ? product.gallery : [resolveImage(product)]);
+
+  // Compute curated similar products
+  const productPool = (Array.isArray(allProducts) && allProducts.length > 0) ? allProducts : SEED_PRODUCTS;
+  const currentId = product.id || product._id;
+
+  const sameCategory = productPool.filter(p => {
+    const pId = p.id || p._id;
+    return pId !== currentId && p.category === product.category;
+  });
+
+  const otherItems = productPool.filter(p => {
+    const pId = p.id || p._id;
+    return pId !== currentId && !sameCategory.some(sc => (sc.id || sc._id) === pId);
+  });
+
+  const similarProducts = [...sameCategory, ...otherItems].slice(0, 4);
+
+  const handleSelectSimilarProduct = (item) => {
+    soundManager.playTap();
+    setProduct(item);
+    setActiveImage(resolveImage(item));
+    setSelectedColor((item.colors && item.colors[0]) || null);
+    setSelectedSize((item.sizes && item.sizes[0]) || null);
+    setQuantity(1);
+    setShowReviewForm(false);
+    if (onSelectProduct) {
+      onSelectProduct(item);
+    }
+    if (modalScrollRef.current) {
+      modalScrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   const handleAdd = () => {
     soundManager.playAddToCart();
@@ -93,7 +155,7 @@ export default function ProductModal({ product, onClose, onProductUpdated, onDir
           <X className="w-5 h-5" />
         </button>
 
-        <div className="overflow-y-auto p-6 sm:p-8">
+        <div ref={modalScrollRef} className="overflow-y-auto p-6 sm:p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
             
             {/* Gallery Column */}
@@ -143,6 +205,119 @@ export default function ProductModal({ product, onClose, onProductUpdated, onDir
                   <span>30-Day Trial</span>
                 </div>
               </div>
+
+              {/* Similar Products Section - fills the lower space elegantly */}
+              {similarProducts.length > 0 && (
+                <div className="pt-5 border-t border-zinc-200/80">
+                  <div className="flex items-center justify-between mb-3.5">
+                    <div className="flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-900">
+                        Similar & Complementary Pieces
+                      </h3>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 border border-amber-500/20">
+                      {similarProducts.length} Curated
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    {similarProducts.map((item) => {
+                      const itemImg = resolveImage(item);
+                      const itemPrice = typeof item.price === 'number' ? item.price : Number(item.price) || 0;
+
+                      return (
+                        <div
+                          key={item.id || item._id}
+                          onClick={() => handleSelectSimilarProduct(item)}
+                          className="group relative bg-zinc-50 hover:bg-white rounded-2xl p-2.5 border border-zinc-200 hover:border-amber-400/80 hover:shadow-lg hover:shadow-amber-500/10 transition-all duration-200 text-left cursor-pointer flex flex-col justify-between"
+                        >
+                          <div>
+                            {/* Product Thumbnail */}
+                            <div className="aspect-[4/3] w-full rounded-xl overflow-hidden bg-white mb-2 relative border border-zinc-100">
+                              <img
+                                src={itemImg}
+                                alt={item.title}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                onError={(e) => {
+                                  e.currentTarget.src = '/images/charger.jpg';
+                                }}
+                              />
+                              {item.badge && (
+                                <span className="absolute top-1 left-1 px-1.5 py-0.5 bg-zinc-950/80 backdrop-blur-xs text-[9px] font-bold text-amber-300 rounded">
+                                  {item.badge}
+                                </span>
+                              )}
+                              <span className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-zinc-900/85 backdrop-blur-xs text-[9px] font-semibold text-white rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                View →
+                              </span>
+                            </div>
+
+                            {/* Category & Rating */}
+                            <div className="flex items-center justify-between text-[10px] mb-1">
+                              <span className="font-bold text-amber-600 uppercase tracking-wider truncate max-w-[90px]">
+                                {item.category}
+                              </span>
+                              <div className="flex items-center gap-0.5 text-amber-400 shrink-0">
+                                <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
+                                <span className="font-bold text-zinc-700 text-[10px]">{item.rating || 4.8}</span>
+                              </div>
+                            </div>
+
+                            {/* Title */}
+                            <h4 className="text-xs font-semibold text-zinc-900 line-clamp-1 group-hover:text-amber-600 transition-colors">
+                              {item.title}
+                            </h4>
+                          </div>
+
+                          {/* Price & Action Buttons */}
+                          <div className="flex items-center justify-between mt-2 pt-2 border-t border-zinc-200/60">
+                            <div>
+                              <span className="text-xs font-extrabold text-zinc-900">
+                                ₹{itemPrice.toLocaleString('en-IN')}
+                              </span>
+                              {item.originalPrice && item.originalPrice > itemPrice && (
+                                <span className="text-[10px] text-zinc-400 line-through ml-1 hidden sm:inline">
+                                  ₹{item.originalPrice.toLocaleString('en-IN')}
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                title="⚡ Direct 1-Click Buy"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  soundManager.playDirectBuy();
+                                  if (onDirectBuy) onDirectBuy(item);
+                                  if (onClose) onClose();
+                                }}
+                                className="p-1.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 rounded-lg shadow-xs hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                              >
+                                <Zap className="w-3 h-3 fill-zinc-950" />
+                              </button>
+                              <button
+                                type="button"
+                                title="Add to Bag"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  soundManager.playAddToCart();
+                                  addToCart(item, 1);
+                                  showToast(`${item.title} added to bag!`);
+                                }}
+                                className="p-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg shadow-xs hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                              >
+                                <ShoppingBag className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Info Column */}

@@ -561,6 +561,256 @@
           "comment": "No break-in period required. Incredibly comfortable and goes with everything from jeans to suits."
         }
       ]
+    },
+    {
+      "id": "prod_13",
+      "title": "Aura Royal 18K Yellow Gold Solitaire Ring",
+      "category": "Fine Jewelry",
+      "price": 68000,
+      "originalPrice": 75000,
+      "rating": 5,
+      "reviewsCount": 38,
+      "inStock": true,
+      "stockQuantity": 7,
+      "featured": true,
+      "badge": "Masterpiece",
+      "image": "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=800&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=800&q=80"
+      ],
+      "shortDescription": "Certified 1.5-carat lab-grown VVS1 brilliant cut diamond set in solid 18K gold.",
+      "description": "Forged in ethical brilliance. Featuring an exquisite 1.5-carat center stone cut to ideal proportions for maximum light dispersion, set securely in a tapered six-prong solid 18K yellow gold band. Includes IGI certificate of authenticity.",
+      "features": [
+        "18-karat recycled yellow gold hallmarked band",
+        "1.5 Carat center diamond (Color D, Clarity VVS1)",
+        "Hand-polished comfort fit shank",
+        "Lifetime guarantee & complimentary annual ultrasonic cleaning"
+      ],
+      "colors": [
+        "18K Yellow Gold",
+        "18K White Gold",
+        "18K Rose Gold"
+      ],
+      "sizes": [
+        "Size 6",
+        "Size 7",
+        "Size 8",
+        "Size 9"
+      ],
+      "createdAt": "2026-03-01T10:00:00Z",
+      "reviews": [
+        {
+          "id": "rev_14",
+          "userName": "Aarav Singhania",
+          "rating": 5,
+          "date": "2026-03-10",
+          "comment": "Breathtaking fire and brilliance. My fiancée was completely mesmerized."
+        }
+      ]
+    },
+    {
+      "id": "prod_14",
+      "title": "Chronos Swiss Automatic Mechanical Tourbillon",
+      "category": "Fine Jewelry",
+      "price": 84000,
+      "originalPrice": 95000,
+      "rating": 4.9,
+      "reviewsCount": 29,
+      "inStock": true,
+      "stockQuantity": 5,
+      "featured": true,
+      "badge": "Collector Edition",
+      "image": "https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=800&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=800&q=80"
+      ],
+      "shortDescription": "High-frequency automatic mechanical movement with open-heart skeleton escapement.",
+      "description": "The pinnacle of micro-mechanical horology. Exhibiting 28,800 vibrations per hour with a 72-hour power reserve. Encased in surgical 316L stainless steel with double-domed scratchproof sapphire crystal on both front and exhibition caseback.",
+      "features": [
+        "Custom caliber 28-jewel automatic movement",
+        "Exhibition skeleton case back displaying blued screws and Geneva stripes",
+        "Genuine alligator grain leather strap with butterfly deployant clasp",
+        "Water resistant to 100 meters"
+      ],
+      "colors": [
+        "Obsidian Skeleton",
+        "Rose Gold Silver",
+        "Midnight Navy"
+      ],
+      "createdAt": "2026-03-03T11:00:00Z",
+      "reviews": [
+        {
+          "id": "rev_15",
+          "userName": "Vikramaditya S.",
+          "rating": 5,
+          "date": "2026-03-14",
+          "comment": "The sweeping second hand is hypnotic. Remarkable value for a skeleton mechanical."
+        }
+      ]
+    },
+    {
+      "id": "prod_15",
+      "title": "Aura Santal Imperial Extrait de Parfum (100ml)",
+      "category": "Fragrances",
+      "price": 16800,
+      "originalPrice": 19500,
+      "rating": 4.9,
+      "reviewsCount": 73,
+      "inStock": true,
+      "stockQuantity": 21,
+      "featured": true,
+      "badge": "Niche Fragrance",
+      "image": "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=800&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=800&q=80"
+      ],
+      "shortDescription": "Extrait de parfum featuring creamy Mysore sandalwood, cardamon, and smoky iris.",
+      "description": "An unforgettable signature olfactory journey. Blended at an extraordinary 30% oil concentration for 16-hour sillage. Notes of aged Mysore sandalwood harmonize with Florentine iris, black cardamom, cedarwood, and bourbon vanilla.",
+      "features": [
+        "30% Extrait de Parfum concentration",
+        "Hand-bottled heavy crystal flacon with magnetic gold cap",
+        "Cruelty-free, vegan, aged in Grasse, France",
+        "100ml spray bottle with travel atomizer included"
+      ],
+      "colors": [
+        "Heavy Crystal 100ml"
+      ],
+      "createdAt": "2026-03-05T12:00:00Z",
+      "reviews": [
+        {
+          "id": "rev_16",
+          "userName": "Zoya K.",
+          "rating": 5,
+          "date": "2026-03-11",
+          "comment": "Lasts all day through dinner and evening events. Constantly getting compliments."
+        }
+      ]
+    },
+    {
+      "id": "prod_16",
+      "title": "Venetian Pure Mulberry Silk Heritage Scarf",
+      "category": "Fashion",
+      "price": 8900,
+      "originalPrice": 10500,
+      "rating": 4.8,
+      "reviewsCount": 45,
+      "inStock": true,
+      "stockQuantity": 18,
+      "featured": false,
+      "badge": "Artisanal",
+      "image": "https://images.unsplash.com/photo-1601924994987-69e26d50dc26?auto=format&fit=crop&w=800&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1601924994987-69e26d50dc26?auto=format&fit=crop&w=800&q=80"
+      ],
+      "shortDescription": "100% Grade 6A mulberry silk with hand-rolled hems and architectural gold motifs.",
+      "description": "Woven from 19-momme pure mulberry silk for a featherlight sensuous drape. Hand-screened using non-toxic reactive dyes that produce radiant, fade-resistant color depth. Finished with hand-rolled and hand-sewn edges by Italian artisans.",
+      "features": [
+        "100% Grade 6A pure mulberry silk (19 momme)",
+        "Dimensions: 90cm x 90cm (35\" x 35\")",
+        "Hand-rolled and hand-stitched borders",
+        "Packaged in an embossed NIKK AURA presentation gift box"
+      ],
+      "colors": [
+        "Gold Baroque & Black",
+        "Emerald & Ivory",
+        "Crimson & Navy"
+      ],
+      "createdAt": "2026-03-07T12:00:00Z",
+      "reviews": [
+        {
+          "id": "rev_17",
+          "userName": "Priya Sharma",
+          "rating": 5,
+          "date": "2026-03-12",
+          "comment": "The silk has an exquisite weight and sheen. Beautiful packaging too."
+        }
+      ]
+    },
+    {
+      "id": "prod_17",
+      "title": "Milano Carbon Fiber & Leather Slim Bifold",
+      "category": "Accessories",
+      "price": 5400,
+      "originalPrice": 6500,
+      "rating": 4.7,
+      "reviewsCount": 88,
+      "inStock": true,
+      "stockQuantity": 45,
+      "featured": false,
+      "badge": "EDC Essential",
+      "image": "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=800&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=800&q=80"
+      ],
+      "shortDescription": "Real 3K twill matte carbon fiber fused with full-grain nappa leather & RFID shield.",
+      "description": "Ultra-compact everyday luxury. Engineered from genuine aerospace 3K carbon fiber woven weave combined with velvety soft full-grain nappa leather. Features 8 card slots, dual currency compartments, and full military-grade RFID protection.",
+      "features": [
+        "Real 3K matte weave carbon fiber exterior",
+        "Ultra-thin 9mm silhouette that prevents pocket bulge",
+        "Integrated aerospace aluminum RFID shielding",
+        "8 dedicated card slots + 2 hidden slip pockets"
+      ],
+      "colors": [
+        "Matte Stealth Carbon",
+        "Forged Marble Carbon"
+      ],
+      "createdAt": "2026-03-08T12:00:00Z",
+      "reviews": [
+        {
+          "id": "rev_18",
+          "userName": "Rohan Mehra",
+          "rating": 5,
+          "date": "2026-03-13",
+          "comment": "Remarkably slim yet fits 10 cards easily. The carbon fiber feels indestructible."
+        }
+      ]
+    },
+    {
+      "id": "prod_18",
+      "title": "Tuscan Suede Handcrafted Chelsea Boots",
+      "category": "Fashion",
+      "price": 21500,
+      "originalPrice": 25000,
+      "rating": 4.9,
+      "reviewsCount": 57,
+      "inStock": true,
+      "stockQuantity": 16,
+      "featured": false,
+      "badge": "Artisanal",
+      "image": "https://images.unsplash.com/photo-1638247025967-b4e38f787b76?auto=format&fit=crop&w=800&q=80",
+      "gallery": [
+        "https://images.unsplash.com/photo-1638247025967-b4e38f787b76?auto=format&fit=crop&w=800&q=80"
+      ],
+      "shortDescription": "Weatherproofed Italian calf suede boots with Blake-stitched leather and rubber soles.",
+      "description": "Handmade in Florence using time-honored Blake welting. Cut from premium water-repellent calf suede, lined with glove-soft leather, and equipped with durable rubber-injected leather soles for dependable grip.",
+      "features": [
+        "Italian water-resistant oiled calf suede",
+        "Resoleable Blake-stitch sole construction",
+        "Elasticized side gussets for effortless pull-on comfort",
+        "Reinforced grosgrain heel pull tabs"
+      ],
+      "colors": [
+        "Chocolate Suede",
+        "Tobacco Tan Suede",
+        "Charcoal Black"
+      ],
+      "sizes": [
+        "US 8",
+        "US 9",
+        "US 10",
+        "US 11",
+        "US 12"
+      ],
+      "createdAt": "2026-03-09T12:00:00Z",
+      "reviews": [
+        {
+          "id": "rev_19",
+          "userName": "Kabir Oberoi",
+          "rating": 5,
+          "date": "2026-03-15",
+          "comment": "Fits true to size. The suede has rich texture and the silhouette is sleek."
+        }
+      ]
     }
   ],
   "orders": [

@@ -332,6 +332,8 @@ function ShopContent() {
       {quickViewProduct && (
         <ProductModal
           product={quickViewProduct}
+          allProducts={products}
+          onSelectProduct={(p) => setQuickViewProduct(p)}
           onClose={() => setQuickViewProduct(null)}
           onProductUpdated={loadProducts}
           onDirectBuy={handleDirectBuy}
