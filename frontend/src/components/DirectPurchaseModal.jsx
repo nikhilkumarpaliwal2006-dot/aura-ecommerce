@@ -32,8 +32,8 @@ export default function DirectPurchaseModal({ product, options = {}, isOpen, onC
 
   // Pre-populate shipping address
   const [shippingAddress, setShippingAddress] = useState({
-    name: user?.name || '',
-    phone: '',
+    name: user?.name || 'Valued Collector',
+    phone: '+91 98765 43210',
     address: 'Bespoke Luxury Residence, South Extension',
     city: 'New Delhi',
     state: 'Delhi',
@@ -97,8 +97,7 @@ export default function DirectPurchaseModal({ product, options = {}, isOpen, onC
       const res = await api.createOrder(orderData);
       if (res.success && res.order) {
         soundManager.playCongratulationsSound();
-        setOrderSuccess(res.order);
-        showToast('🎉 Congratulations! Direct Order Placed.');
+        if (onClose) onClose();
         if (onOrderPlaced) onOrderPlaced(res.order);
       } else {
         throw new Error(res.message || 'Direct checkout could not be completed');

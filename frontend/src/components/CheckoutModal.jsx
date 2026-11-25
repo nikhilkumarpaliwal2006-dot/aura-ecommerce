@@ -96,17 +96,8 @@ export default function CheckoutModal({ isOpen, onClose, onOrderPlaced }) {
 
       if (res.success) {
         soundManager.playCongratulationsSound();
-        setCompletedOrder(res.order);
         clearCart();
-        showToast('🎉 Congratulations! Order confirmed & payment verified.');
-
-        // Trigger celebratory confetti
-        confetti({
-          particleCount: 120,
-          spread: 80,
-          origin: { y: 0.6 }
-        });
-
+        if (onClose) onClose();
         if (onOrderPlaced) onOrderPlaced(res.order);
       }
     } catch (err) {
