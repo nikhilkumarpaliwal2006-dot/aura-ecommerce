@@ -13,7 +13,8 @@ import {
   ChevronDown,
   X,
   Volume2,
-  VolumeX
+  VolumeX,
+  Package
 } from 'lucide-react';
 import { soundManager } from '../utils/audio';
 
@@ -359,6 +360,28 @@ export default function Navbar({
                   </div>
                 )}
               </div>
+
+              {/* Prominent Track Orders Button */}
+              <button
+                onClick={() => {
+                  soundManager.playTap();
+                  onOpenOrders();
+                }}
+                className="relative flex items-center gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-zinc-900 via-zinc-950 to-zinc-900 text-amber-300 hover:text-amber-200 border border-amber-500/35 hover:border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.15)] hover:shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all cursor-pointer group"
+                title="Live Order Tracking & Shipment Status"
+              >
+                <div className="relative">
+                  <Package className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
+                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400"></span>
+                </div>
+                <span className="text-xs font-bold tracking-wide hidden sm:inline">
+                  Track Orders
+                </span>
+                <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  LIVE
+                </span>
+              </button>
 
               {/* Shopping Bag Button */}
               <button

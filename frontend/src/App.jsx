@@ -59,6 +59,7 @@ function ShopContent() {
   const [authOpen, setAuthOpen] = useState(false);
   const [wishlistOpen, setWishlistOpen] = useState(false);
   const [ordersOpen, setOrdersOpen] = useState(false);
+  const [selectedTrackingOrderId, setSelectedTrackingOrderId] = useState(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
 
@@ -352,7 +353,9 @@ function ShopContent() {
           isOpen={!!celebrationOrder}
           order={celebrationOrder}
           onClose={() => setCelebrationOrder(null)}
-          onViewDetails={() => {
+          onViewDetails={(ord) => {
+            const targetId = ord?.id || celebrationOrder?.id;
+            setSelectedTrackingOrderId(targetId);
             setCelebrationOrder(null);
             setOrdersOpen(true);
           }}
@@ -361,7 +364,11 @@ function ShopContent() {
 
       <OrderHistoryModal
         isOpen={ordersOpen}
-        onClose={() => setOrdersOpen(false)}
+        initialOrderId={selectedTrackingOrderId}
+        onClose={() => {
+          setOrdersOpen(false);
+          setSelectedTrackingOrderId(null);
+        }}
       />
 
       <WishlistModal
@@ -381,6 +388,29 @@ function ShopContent() {
         onClose={() => setAdminOpen(false)}
         onRefreshCatalog={loadProducts}
       />
+
+      {/* Floating Fast Order Tracker Dock Pill */}
+      <aside aria-label="Order Tracking Quick Access" className="fixed bottom-6 left-6 z-40 hidden sm:flex items-center">
+        <button
+          onClick={() => {
+            soundManager.playTap();
+            setOrdersOpen(true);
+          }}
+          className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-zinc-950/90 hover:bg-black text-white border border-amber-500/40 hover:border-amber-400 shadow-[0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-md transition-all hover:scale-105 active:scale-95 cursor-pointer group"
+          title="Track your active shipments & arrival dates"
+        >
+          <div className="relative">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 block animate-ping absolute inset-0"></span>
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 block relative"></span>
+          </div>
+          <span className="text-xs font-serif font-black tracking-wider text-amber-300 group-hover:text-amber-200">
+            TRACK ORDERS
+          </span>
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold uppercase tracking-widest">
+            LIVE 📍
+          </span>
+        </button>
+      </aside>
 
     </div>
   );

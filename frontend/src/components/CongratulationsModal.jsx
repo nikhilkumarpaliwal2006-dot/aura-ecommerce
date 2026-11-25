@@ -139,7 +139,8 @@ export default function CongratulationsModal({ order, isOpen, onClose, onViewDet
               }}
               className="w-full py-3.5 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-[0_0_25px_rgba(245,158,11,0.3)] hover:scale-[1.01] active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>View Order Receipt</span>
+              <Truck className="w-4 h-4 text-zinc-950" />
+              <span>Live Track Order & Delivery Timeline</span>
               <ArrowRight className="w-4 h-4" />
             </button>
 

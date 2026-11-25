@@ -333,7 +333,7 @@ export default function ProductModal({
                         }`}
                       >
                         <img src={img} alt="" className="w-full h-full object-cover" />
-                        {matchingColor && (
+                        {typeof matchingColor === 'string' && matchingColor.length > 0 && (
                           <span className="absolute bottom-0 inset-x-0 bg-black/75 text-[8px] font-bold text-white text-center py-0.5 truncate px-0.5">
                             {matchingColor.split(' ')[0]}
                           </span>

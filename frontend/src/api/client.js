@@ -244,54 +244,169 @@ export const api = {
     }
   },
 
-  // Orders
+  // Orders & Live Tracking Logistics
+  _getDefaultDemoOrders: () => {
+    const d1 = new Date();
+    d1.setHours(d1.getHours() - 14);
+    const estDate1 = new Date();
+    estDate1.setDate(estDate1.getDate() + 2);
+
+    const d2 = new Date();
+    d2.setDate(d2.getDate() - 4);
+
+    return [
+      {
+        id: 'ord_7824',
+        status: 'shipped',
+        createdAt: d1.toISOString(),
+        estimatedDelivery: estDate1.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+        trackingNumber: 'AUR-928174-EXP',
+        carrier: 'Blue Dart Air Priority Express',
+        currentLocation: 'Indira Gandhi Int\'l Air Cargo Hub, New Delhi',
+        deliverySpeed: 'Express 2-Day Priority Air',
+        subtotal: 24999,
+        totalAmount: 24999,
+        paymentMethod: 'UPI / NetBanking',
+        shippingAddress: {
+          fullName: 'Valued Collector',
+          city: 'New Delhi',
+          state: 'Delhi',
+          postalCode: '110001',
+          country: 'India',
+          phone: '+91 98765 43210'
+        },
+        items: [
+          {
+            productId: 'prod_1',
+            title: 'Aura Studio Wireless ANC Headphones',
+            price: 24999,
+            quantity: 1,
+            selectedColor: 'Silver Titanium',
+            image: 'https://images.unsplash.com/photo-1484704849700-f032a568e944?auto=format&fit=crop&w=800&q=80'
+          }
+        ]
+      },
+      {
+        id: 'ord_6219',
+        status: 'delivered',
+        createdAt: d2.toISOString(),
+        estimatedDelivery: 'Delivered on ' + d2.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
+        deliveredAt: d2.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+        trackingNumber: 'AUR-481920-EXP',
+        carrier: 'Blue Dart Air Priority Express',
+        currentLocation: 'Delivered to Doorstep (Signed by Recipient)',
+        deliverySpeed: 'Express 2-Day Priority Air',
+        subtotal: 12499,
+        totalAmount: 12499,
+        paymentMethod: 'Credit Card',
+        shippingAddress: {
+          fullName: 'Valued Collector',
+          city: 'Mumbai',
+          state: 'Maharashtra',
+          postalCode: '400001',
+          country: 'India',
+          phone: '+91 98765 43210'
+        },
+        items: [
+          {
+            productId: 'prod_11',
+            title: 'Minimalist Monolith Magnetic Wireless Charger',
+            price: 12499,
+            quantity: 1,
+            selectedColor: 'Space Gray Anodized',
+            image: '/images/charger.jpg'
+          }
+        ]
+      }
+    ];
+  },
+
   createOrder: async (orderPayload) => {
+    const est = new Date();
+    est.setDate(est.getDate() + 2);
+
+    const generatedTracking = {
+      trackingNumber: 'AUR-' + Math.floor(100000 + Math.random() * 900000) + '-EXP',
+      carrier: 'Blue Dart Air Priority Express',
+      estimatedDelivery: est.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+      currentLocation: 'Central Fulfillment Vault, New Delhi',
+      status: 'shipped'
+    };
+
+    const payloadWithTracking = {
+      ...generatedTracking,
+      ...orderPayload
+    };
+
+    let resultOrder = null;
     try {
       const token = localStorage.getItem('aura_token');
-      return await safeFetch(`${API_BASE}/orders`, {
+      const res = await safeFetch(`${API_BASE}/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
-        body: JSON.stringify(orderPayload)
+        body: JSON.stringify(payloadWithTracking)
       });
-    } catch (err) {
-      const newOrder = {
+      if (res && res.order) {
+        resultOrder = res.order;
+      }
+    } catch (err) {}
+
+    if (!resultOrder) {
+      resultOrder = {
         id: 'ord_' + Math.floor(1000 + Math.random() * 9000),
-        status: 'processing',
         createdAt: new Date().toISOString(),
-        ...orderPayload
-      };
-      try {
-        const storedOrders = JSON.parse(localStorage.getItem('aura_mock_orders') || '[]');
-        storedOrders.unshift(newOrder);
-        localStorage.setItem('aura_mock_orders', JSON.stringify(storedOrders));
-      } catch (e) {}
-      return {
-        success: true,
-        order: newOrder
+        ...payloadWithTracking
       };
     }
+
+    // Always guarantee stored in local mock orders for guest & offline instant tracking
+    try {
+      const stored = JSON.parse(localStorage.getItem('aura_mock_orders') || '[]');
+      stored.unshift(resultOrder);
+      localStorage.setItem('aura_mock_orders', JSON.stringify(stored));
+    } catch (e) {}
+
+    return {
+      success: true,
+      order: resultOrder
+    };
   },
 
   getMyOrders: async () => {
+    let combined = [];
     try {
       const token = localStorage.getItem('aura_token');
-      return await safeFetch(`${API_BASE}/orders/my-orders`, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      if (token) {
+        const res = await safeFetch(`${API_BASE}/orders/my-orders`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (res && res.orders) {
+          combined = res.orders;
         }
-      });
-    } catch (err) {
-      try {
-        const storedOrders = JSON.parse(localStorage.getItem('aura_mock_orders') || '[]');
-        return { success: true, count: storedOrders.length, orders: storedOrders };
-      } catch (e) {
-        return { success: true, count: 0, orders: [] };
       }
-    }
+    } catch (e) {}
+
+    try {
+      let localOrders = JSON.parse(localStorage.getItem('aura_mock_orders') || '[]');
+      if (localOrders.length === 0 && combined.length === 0) {
+        localOrders = api._getDefaultDemoOrders();
+        localStorage.setItem('aura_mock_orders', JSON.stringify(localOrders));
+      }
+      const ids = new Set(combined.map(o => o.id || o._id));
+      for (const lo of localOrders) {
+        if (!ids.has(lo.id || lo._id)) {
+          combined.push(lo);
+        }
+      }
+    } catch (e) {}
+
+    return { success: true, count: combined.length, orders: combined };
   },
 
   getOrderById: async (id) => {
@@ -300,10 +415,14 @@ export const api = {
     } catch (err) {
       try {
         const storedOrders = JSON.parse(localStorage.getItem('aura_mock_orders') || '[]');
-        const ord = storedOrders.find(o => o.id === id);
+        const ord = storedOrders.find(o => (o.id === id || o.trackingNumber === id || o._id === id));
         if (ord) return { success: true, order: ord };
+        // Also check demo orders
+        const demoOrders = api._getDefaultDemoOrders();
+        const demoOrd = demoOrders.find(o => (o.id === id || o.trackingNumber === id));
+        if (demoOrd) return { success: true, order: demoOrd };
       } catch (e) {}
-      throw new Error('Order not found');
+      throw new Error('Order reference not found');
     }
   },
 
