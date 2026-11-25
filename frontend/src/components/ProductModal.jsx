@@ -56,7 +56,7 @@ export default function ProductModal({
     return [prod.image || '/images/charger.jpg'];
   };
 
-  const [images, setImages] = useState(() => getProductImages(initialProduct));
+  const images = getProductImages(product);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedColor, setSelectedColor] = useState((initialProduct.colors && initialProduct.colors[0]) || null);
   const [selectedSize, setSelectedSize] = useState((initialProduct.sizes && initialProduct.sizes[0]) || null);
@@ -66,18 +66,17 @@ export default function ProductModal({
   const [newComment, setNewComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
 
-  // Sync state if initialProduct prop updates
+  // Sync state only if a different product is selected from parent
+  const initialProductId = initialProduct?.id || initialProduct?._id;
   useEffect(() => {
     if (initialProduct) {
       setProduct(initialProduct);
-      const newImages = getProductImages(initialProduct);
-      setImages(newImages);
       setActiveImageIndex(0);
       setSelectedColor((initialProduct.colors && initialProduct.colors[0]) || null);
       setSelectedSize((initialProduct.sizes && initialProduct.sizes[0]) || null);
       setQuantity(1);
     }
-  }, [initialProduct]);
+  }, [initialProductId]);
 
   // Handlers for bidirectional sync between Color buttons and Gallery Images
   const handleSelectColor = (color, colorIdx) => {
@@ -163,8 +162,6 @@ export default function ProductModal({
   const handleSelectSimilarProduct = (item) => {
     soundManager.playTap();
     setProduct(item);
-    const itemImages = getProductImages(item);
-    setImages(itemImages);
     setActiveImageIndex(0);
     setSelectedColor((item.colors && item.colors[0]) || null);
     setSelectedSize((item.sizes && item.sizes[0]) || null);
